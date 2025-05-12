@@ -1,0 +1,16 @@
+@import "tailwindcss";
+
+:root {
+    /* page prefers dark mode */
+    color-scheme: dark;
+}
+
+body {
+    background-image: url('/images/internal/background.webp');
+    background-repeat: repeat;
+}
+
+.navigation {
+    background-image: url('/images/internal/banner_backdrop.webp');
+    background-repeat: repeat-x;
+}
