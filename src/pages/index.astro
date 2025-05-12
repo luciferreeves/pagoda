@@ -1,7 +1,17 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import AnnouncementsMarqueeComponent from "../components/AnnouncementsMarqueeComponent.astro";
 ---
 
 <Layout title="Home">
-  <h1>Welcome to Pagoda</h1>
+  <section class="text-justify mb-8">
+    <p>Welcome to <em>Pagoda</em> on <a class="link" href="https://neocities.org" target="_blank" rel="noopener noreferrer">Neocities</a>! This is a project dedicated to provide a collection of resources and tools for the Neocities community. Pagoda is a hub for all things Neocities, where you can find avatars, backgrounds, blinkies, flags, stamps, and more. Pagoda also offers a variety of services to enhance your own Neocities site, like guestbooks, comments, and webrings. Whether you're a new user or a seasoned veteran, Pagoda has something for everyone.</p>
+    <p>Additionally, you can also find <a class="link" href="/guides">guides</a> to help you with efficiently running and maintaining your Neocities site. These guides cover a wide range of topics, from basic HTML and CSS to more advanced techniques. We also have <a class="link" href="/districts">Districts</a> that you can explore, which are collections of Neocities sites that share a common theme or interest. Each district has its own unique style and personality, and you can find a variety of sites to explore within each one.</p>
+    <p>Pagoda is constantly evolving, and always looking for new ways to improve and expand the project and its offerings. Any feedback or suggestions are always welcome! If you would like to contribute to Pagoda, or want to get your own site added or a district, or if you have any questions or concerns, please check out the <a class="link" href="/faq">FAQ</a> for more information.
+  </section>
+  <section class="mb-8">
+    <img src="/images/internal/updates.gif" alt="News and Updates" class="h-6 w-auto pointer-events-none select-none" />
+    <img src="/images/internal/divider.gif" alt="Divider" class="w-full h-auto pointer-events-none select-none" />
+    <AnnouncementsMarqueeComponent />
+  </section>
 </Layout>

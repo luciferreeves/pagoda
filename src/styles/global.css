@@ -40,3 +40,7 @@ body {
 .saira {
     font-family: Saira Extra Condensed, sans-serif;
 }
+
+.link {
+    @apply text-pagodapink hover:text-pagodapurple hover:underline decoration-dotted
+}
