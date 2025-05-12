@@ -24,10 +24,16 @@ const { title } = Astro.props;
     </nav>
     <main class="w-[1080px] m-auto flex flex-row gap-4">
       <LeftSidebar />
-      <div class="w-2/3 text-sm py-4 bg-black/50">
+      <div class="w-2/3 py-4 bg-black/50">
         <slot />
       </div>
       <RightSidebar />
     </main>
+    <footer class="w-[1080px] m-auto text-center mt-8">
+      <hr> 
+      <p class="text-xs py-4">
+        &copy; {new Date().getFullYear()} Pagoda on Neocities. All rights reserved. Brought to you by <a href="https://shi.foo" target="_blank" rel="noopener noreferrer" class="text-pagodapurple-shine hover:text-pagodapink-shine hover:decoration-dotted hover:underline">shi.foo</a>.
+      </p>
+    </footer>
   </body>
 </html>

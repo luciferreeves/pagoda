@@ -1,0 +1,20 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import DistrictCardComponent from "../../components/DistrictCardComponent.astro";
+import { districts, Districts } from "../../data/districts";
+---
+<Layout title="Districts">
+    <h1 class="text-2xl saira">Districts on Pagoda</h1>
+    <div class="text-justify mb-8 text-sm">
+        <p>Districts are collections of Neocities sites that share a common theme or interest. Each district has its own unique style and personality, and you can find a variety of sites to explore within each one. You can also find districts that are dedicated to specific topics, such as art, music, or gaming.</p>
+        <p>Each district contains a curated list of sites that are related to the district's theme. You can explore these sites and discover new content that you may not have found otherwise. Districts are a great way to connect with other Neocities users who share your interests, and to find new sites to explore.</p>
+        <p>Districts are constantly evolving, and new districts are being added all the time. If you have a site that you think would be a good fit for a district, check out the <a class="link" href="/faq">FAQ</a> for more information on how to get your site added to a district.</p>
+    </div>
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 mt-4">
+        {districts.map((district) => (
+            <DistrictCardComponent district={district} />
+        ))}
+    </section>
+
+
+</Layout>

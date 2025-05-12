@@ -1,0 +1,18 @@
+---
+import Layout from "../../layouts/Layout.astro";
+import DistrictCardComponent from "../../components/DistrictCardComponent.astro";
+import { districts, getDistrictById, District } from "../../data/districts";
+
+export function getStaticPaths() {
+  return districts.map(district => ({
+    params: { district: district.id }
+  }));
+}
+
+const { district } = Astro.params;
+const districtData = getDistrictById(district);
+---
+
+<Layout title={`${districtData.name || district} District`}>
+    <DistrictCardComponent district={districtData} />
+</Layout>

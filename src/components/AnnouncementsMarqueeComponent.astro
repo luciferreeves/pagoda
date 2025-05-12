@@ -1,15 +1,11 @@
 ---
-import type { Announcement } from '../types/Announcement';
-import announcementsData from '../data/announcements.json';
+import { getAnnouncements, Announcement } from '../data/announcements';
 import SingleAnnouncementComponent from './SingleAnnouncementComponent.astro';
 
-const announcements: Announcement[] = announcementsData;
-const sortedAnnouncements = announcements.sort((a, b) => {
-    return new Date(b.date).getTime() - new Date(a.date).getTime();
-});
+const announcements: Announcement[] = getAnnouncements();
 ---
 <marquee behavior="scroll" direction="up" scrollamount="1" scrolldelay="30" onmouseover="this.stop()" onmouseout="this.start()" class="h-[180px] w-[672px] border-b-2 border-white/75 relative left-2">
-    {sortedAnnouncements.map((announcement) => (
+    {announcements.map((announcement) => (
         <SingleAnnouncementComponent isNew={announcement.isNew} date={announcement.date}>
             {announcement.text}
         </SingleAnnouncementComponent>
