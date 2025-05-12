@@ -1,9 +1,31 @@
 @import "tailwindcss";
 
+@theme {
+    --color-pagodapurple: #8853e7;
+    --color-pagodapurple-shine: #d4c5ff;
+    --color-pagodagreen: #91d027;
+    --color-pagodagreen-shine: #cff294;
+    --color-pagodapink: #e42b8f;
+    --color-pagodapink-shine: #ffc8f0;
+    --color-arcadia: #5882ce;
+    --color-arles: #9a7570;
+    --color-hollywood: #a9562d;
+    --color-oxford: #312630;
+    --color-petsburg: #417958;
+    --color-purgatory: #5c518e;
+    --color-silicon-valley: #427571;
+    --color-silver-lake: #39516c;
+    --color-stratford-upon-avon: #ab5742;
+    --color-tokyo: #a25373;
+}
+
+
 :root {
     /* page prefers dark mode */
     color-scheme: dark;
+    font-family: IBM Plex Sans, sans-serif;
 }
+
 
 body {
     background-image: url('/images/internal/background.webp');
@@ -13,4 +35,8 @@ body {
 .navigation {
     background-image: url('/images/internal/banner_backdrop.webp');
     background-repeat: repeat-x;
+}
+
+.saira {
+    font-family: Saira Extra Condensed, sans-serif;
 }

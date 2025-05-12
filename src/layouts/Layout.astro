@@ -1,4 +1,6 @@
 ---
+import LeftSidebar from "../components/LeftSidebarComponent.astro";
+import RightSidebar from "../components/RightSidebarComponent.astro";
 import "../styles/global.css";
 
 const { title } = Astro.props;
@@ -9,16 +11,23 @@ const { title } = Astro.props;
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <link rel="icon" type="image/png" href="/images/internal/favicon.png" />
     <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/png" href="/images/internal/favicon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="true">
+    <link href="https://fonts.googleapis.com/css2?family=Saira+Extra+Condensed:wght@100;200;300;400;500;600;700;800;900&amp;family=IBM+Plex+Sans:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&amp;display=swap" rel="stylesheet">
     <title>Pagoda — {title || "default"}</title>
   </head>
   <body>
-    <nav class="navigation py-4 min-w-[960px]">
+    <nav class="navigation py-4 min-w-[1080px]">
       <img src="/images/internal/pagoda.webp" alt="Pagoda" class="w-64 m-auto select-none pointer-events-none" />
     </nav>
-    <main class="w-[960px] m-auto p-4 border-x-1 border-b-1 border-gray-800 rounded-b-md">
-      <slot />
+    <main class="w-[1080px] m-auto flex flex-row gap-4">
+      <LeftSidebar />
+      <div class="w-2/3">
+        <slot />
+      </div>
+      <RightSidebar />
     </main>
   </body>
 </html>

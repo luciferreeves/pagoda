@@ -1,0 +1,31 @@
+<div class="saira uppercase mb-4 relative bottom-1">
+    <div class="text-xl flex flex-row gap-2 justify-center items-center">
+        <div class="flex-grow h-6 bg-pagodapurple rounded-tl-2xl"></div>
+        <div>Site Search</div>
+    </div>
+    <div class="bg-pagodapurple rounded-br-2xl relative bottom-1 pl-2 pr-1 pt-1 pb-1">
+        <form action="/search" method="GET" class="flex flex-col gap-1">
+            <div class="flex flex-row gap-2 items-center">
+                <label for="search" class="text-white w-1/4">Query:</label>
+                <input type="text" id="search" name="q" class="w-3/4 bg-black text-white border-2 border-pagodapurple rounded-lg px-2 py-1 focus:outline-none focus:border-pagodapink" placeholder="Search..." required />
+            </div>
+            <div class="flex flex-row gap-2 items-center">
+                <label for="category" class="text-white w-1/4">In:</label>
+                <select id="category" name="category" class="w-3/4 bg-black text-white border-2 border-pagodapurple rounded-lg px-2 py-1 focus:outline-none focus:border-pagodapink">
+                    <option value="all">All</option>
+                    <option value="avatars">Avatars</option>
+                    <option value="backgrounds">Tiled Backgrounds</option>
+                    <option value="blinkies">Blinkies</option>
+                    <option value="districts">Districts</option>
+                    <option value="flags">Flags</option>
+                    <option value="guides">Guides</option>
+                    <option value="stamps">Stamps</option>
+                    <option value="thoughts">Thoughts</option>
+                </select>
+            </div>
+            <div class="flex flex-row items-center">
+                <button type="submit" class="bg-pagodapink text-white rounded-lg px-4 py-1 hover:bg-pagodagreen font-bold hover:text-black transition duration-300 cursor-pointer">Search</button>
+            </div>
+        </form>
+    </div>
+</div>

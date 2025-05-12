@@ -1,0 +1,31 @@
+---
+import NavigationComponent from './NavigationComponent.astro';
+import NavigationComponentLink from './NavigationComponentLink.astro';
+---
+
+<aside class="w-1/6">
+    <NavigationComponent title="Navigation">
+        <NavigationComponentLink href="/">Home</NavigationComponentLink>
+        <NavigationComponentLink href="/districts">Districts</NavigationComponentLink>
+        <NavigationComponentLink href="/guides">Guides</NavigationComponentLink>
+        <NavigationComponentLink href="/thoughts">Thoughts</NavigationComponentLink>
+        <NavigationComponentLink href="/faq">FAQ</NavigationComponentLink>
+    </NavigationComponent>
+
+    <img 
+        id="sidebar-image" 
+        src="/images/internal/sidebar/default.gif"
+        alt="Left Sidebar Image" 
+        class="w-full h-auto rounded-xl pointer-events-none select-none" 
+    />
+
+    <NavigationComponent title="Resources" variation="alternate">
+        <NavigationComponentLink href="/resources/avatars">Avatars</NavigationComponentLink>
+        <NavigationComponentLink href="/resources/backgrounds">Tiled Backgrounds</NavigationComponentLink>
+        <NavigationComponentLink href="/resources/blinkies">Blinkies</NavigationComponentLink>
+        <NavigationComponentLink href="/resources/flags">Flags</NavigationComponentLink>
+        <NavigationComponentLink href="/resources/stamps">Stamps</NavigationComponentLink>
+    </NavigationComponent>
+</aside>
+
+<script src="../scripts/sidebarImage.ts"></script>

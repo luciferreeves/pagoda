@@ -1,0 +1,19 @@
+---
+import SearchComponent from './SearchComponent.astro';
+import RightNavigationComponent from './RightNavigationComponent.astro';
+import RightNavigationComponentLink from './RightNavigationComponentLink.astro';
+---
+
+<aside class="w-1/6">
+    <img src="/images/internal/search.webp" alt="Search Image" class="h-32 mt-4 relative ml-20 pointer-events-none select-none" />
+    <SearchComponent />
+    <RightNavigationComponent title="Pagoda Services">
+        <RightNavigationComponentLink href="/services/ad">Advertisement</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/blogs">Blogs</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/comments">Comments</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/counter">Counter</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/guestbook">Guestbook</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/journals">Journals</RightNavigationComponentLink>
+        <RightNavigationComponentLink href="/services/webring">Webring</RightNavigationComponentLink>
+    </RightNavigationComponent>
+</aside>

@@ -1,0 +1,29 @@
+---
+const { title, variation, bordered = true } = Astro.props;
+---
+
+<section class="saira uppercase my-4">
+    <div class="text-xl flex flex-row gap-2 justify-center items-center">
+        <div class={`${
+            variation === "alternate" ? "bg-pagodapink" : "bg-pagodapurple"
+        }
+        rounded-tl-2xl px-4 h-6`}></div>
+        <div>{title}</div>
+        <div class={`${
+            variation === "alternate" ? "bg-pagodapurple" : "bg-pagodapink"
+        } ${
+            bordered ? "rounded-r-2xl" : "rounded-tr-2xl"
+        }
+        flex-grow h-6`}></div>
+    </div>
+    <div class={`
+    ${
+        bordered ? variation === "alternate" ? "border-pagodapink bg-pagodapink" : "border-pagodapurple bg-pagodapurple" : ""
+    }
+    ${
+        bordered ? "border-l-8 border-b-2 border-solid relative bottom-1" : ""
+    }
+    rounded-bl mr-8`}>
+        <slot />
+    </div>
+</section>
