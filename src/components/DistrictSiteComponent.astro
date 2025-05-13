@@ -1,30 +1,54 @@
 ---
 const { site } = Astro.props;
 ---
+
 <div class="flex flex-row justify-between px-2 gap-2 my-4">
-    <div class="w-2/3">
-        <div class="flex flex-row gap-2 items-center justify-between">
-            <h2 class="text-xl saira">
-                <a href={site.url} target="_blank" rel="noopener">{site.name}</a>
-            </h2>
-            <span class="text-gray-500 text-xs">Added: {new Date(site.added).toLocaleDateString()}</span>
-        </div>
-        <p class="text-xs">{site.description}</p>
-        <div class="text-xs">
-            Owner: 
-            <a class="link" href={`https://neocities.org/site/${site.owner}`} target="_blank" rel="noopener">
-                @{site.owner}
-            </a>
-        </div>
-        {site.tags && (
-            <div class="text-xs mt-4">
-                {site.tags.map(tag => (
-                    <span class="bg-pagodapurple text-white rounded px-2 py-1 mr-1">{tag}</span>
-                ))}
-            </div>
-        )}
+  <div class="w-2/3">
+    <div class="flex flex-row gap-2 items-center justify-between">
+      <h2 class="text-xl saira">
+        <a href={site.url} target="_blank" rel="noopener">{site.name}</a>
+      </h2>
+      <span class="text-gray-500 text-xs"
+        >Added: {new Date(site.added).toLocaleDateString()}</span
+      >
     </div>
-    <div class="w-1/3 flex justify-end">
-        <img src={site.screenshotUrl} alt={site.name} class="w-5/6 h-auto" />
+    <p class="text-xs my-2" set:html={site.description} />
+    <div class="text-xs my-2">
+      Owner:
+      <a
+        class="link"
+        href={`https://neocities.org/site/${site.owner}`}
+        target="_blank"
+        rel="noopener"
+      >
+        @{site.owner}
+      </a>
     </div>
+    {
+      site.tags && (
+        <div class="text-xs mt-4">
+          {site.tags.map((tag: string) => (
+            <span class="bg-pagodapurple text-white rounded px-2 py-1 mr-1 uppercase">
+              <a
+                href={`https://neocities.org/browse?tag=${tag}`}
+                target="_blank"
+                rel="noopener"
+              >
+                {tag}
+              </a>
+            </span>
+          ))}
+        </div>
+      )
+    }
+  </div>
+  <div class="w-1/3 flex justify-center items-center">
+    <a href={site.url} target="_blank" rel="noopener">
+      <img
+        src={site.screenshotUrl}
+        alt={site.name}
+        class="w-full h-auto pointer-events-none user-select-none"
+      />
+    </a>
+  </div>
 </div>

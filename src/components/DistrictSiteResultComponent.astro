@@ -1,0 +1,53 @@
+---
+import type { Site } from "../data/districts/types";
+import DistrictSiteComponent from "./DistrictSiteComponent.astro";
+
+const { district, sites, totalPages, currentPage, sitesPerPage } = Astro.props;
+---
+
+<section class="my-4">
+  {
+    sites.length > 0 ? (
+      <>
+        <p class="text-xs font-bold text-justify">
+          Showing {currentPage} of {totalPages} pages. (Max {sitesPerPage} sites
+          per page, Showing {sites.length} sites)
+        </p>
+        {sites.map((site: Site) => (
+          <DistrictSiteComponent site={site} />
+        ))}
+      </>
+    ) : (
+      <p class="text-xs text-justify">No sites found in this district yet.</p>
+    )
+  }
+</section>
+<div class="text-sm flex items-center justify-center gap-2">
+  {
+    Array.from({ length: totalPages }, (_, i) => i + 1).map((page) =>
+      page === currentPage ? (
+        <a
+          class="link font-bold"
+          href={
+            page === 1
+              ? `/districts/${district}`
+              : `/districts/${district}/${page}`
+          }
+        >
+          {page}
+        </a>
+      ) : (
+        <a
+          class="link"
+          href={
+            page === 1
+              ? `/districts/${district}`
+              : `/districts/${district}/${page}`
+          }
+        >
+          {page}
+        </a>
+      )
+    )
+  }
+</div>

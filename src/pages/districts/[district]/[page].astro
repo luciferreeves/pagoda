@@ -1,24 +1,31 @@
 ---
 import Layout from "../../../layouts/Layout.astro";
 import DistrictCardComponent from "../../../components/DistrictCardComponent.astro";
-import DistrictSiteComponent from "../../../components/DistrictSiteComponent.astro";
-import { getDistrictById, getPaginatedSitesByDistrictId } from "../../../data/districts/functions";
+import DistrictSiteResultComponent from "../../../components/DistrictSiteResultComponent.astro";
+import {
+  getDistrictById,
+  getPaginatedSitesByDistrictId,
+} from "../../../data/districts/functions";
 import { districts } from "../../../data/districts/districts";
 
 export async function getStaticPaths() {
-    const paths = [];
-    const sitesPerPage = 3;
-    
-    for (const district of districts) {
-        const { totalPages } = getPaginatedSitesByDistrictId(district.id, 1, sitesPerPage);
-        for (let page = 1; page <= totalPages; page++) {
-            paths.push({
-                params: { district: district.id, page: String(page) }
-            });
-        }
-    }
+  const paths = [];
+  const sitesPerPage = 3;
 
-    return paths;
+  for (const district of districts) {
+    const { totalPages } = getPaginatedSitesByDistrictId(
+      district.id,
+      1,
+      sitesPerPage
+    );
+    for (let page = 1; page <= totalPages; page++) {
+      paths.push({
+        params: { district: district.id, page: String(page) },
+      });
+    }
+  }
+
+  return paths;
 }
 
 const { district, page } = Astro.params;
@@ -26,31 +33,25 @@ const currentPage = parseInt(page || "1");
 const districtData = getDistrictById(district);
 const sitesPerPage = 10;
 
-const { sites, totalPages } = getPaginatedSitesByDistrictId(district, currentPage, sitesPerPage);
+const { sites, totalPages } = getPaginatedSitesByDistrictId(
+  district,
+  currentPage,
+  sitesPerPage
+);
 ---
 
-<Layout title={`${districtData?.name || district} District - Page ${currentPage}`}>
-    <div class="text-sm mb-4">
-        <a class="link" href="/districts">← Back to All Districts</a>
-    </div>
-    <DistrictCardComponent district={districtData} />
-    <section class="my-4">
-        {sites.length > 0 ? (
-            <>
-                <p class="text-xs font-bold text-justify">Showing {currentPage} of {totalPages} pages. (Max {sitesPerPage} sites per page, Showing {sites.length} sites)</p>
-                {sites.map(site => (
-                    <DistrictSiteComponent site={site} />
-                ))}
-            </>
-        ) : (
-            <p class="text-xs text-justify">No sites found in this district yet.</p>
-        )}
-    </section>
-    <div class="text-sm flex items-center justify-center gap-2">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-            page === currentPage
-                ? <a class="link font-bold" href={page === 1 ? `/districts/${district}` : `/districts/${district}/${page}`}>{page}</a>
-                : <a class="link" href={page === 1 ? `/districts/${district}` : `/districts/${district}/${page}`}>{page}</a>
-        ))}
-    </div>
+<Layout
+  title={`${districtData?.name || district} District - Page ${currentPage}`}
+>
+  <div class="text-sm mb-4">
+    <a class="link" href="/districts">← Back to All Districts</a>
+  </div>
+  <DistrictCardComponent district={districtData} />
+  <DistrictSiteResultComponent
+    district={district}
+    sites={sites}
+    totalPages={totalPages}
+    currentPage={currentPage}
+    sitesPerPage={sitesPerPage}
+  />
 </Layout>
