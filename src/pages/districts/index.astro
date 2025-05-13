@@ -1,7 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import DistrictCardComponent from "../../components/DistrictCardComponent.astro";
-import { districts, Districts } from "../../data/districts";
+import { districts } from "../../data/districts/districts";
 ---
 <Layout title="Districts">
     <h1 class="text-2xl saira">Districts on Pagoda</h1>
@@ -15,6 +15,4 @@ import { districts, Districts } from "../../data/districts";
             <DistrictCardComponent district={district} />
         ))}
     </section>
-
-
 </Layout>

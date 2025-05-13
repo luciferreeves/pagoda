@@ -1,25 +1,35 @@
 ---
-import Layout from "../../layouts/Layout.astro";
-import DistrictCardComponent from "../../components/DistrictCardComponent.astro";
-import DistrictSiteComponent from "../../components/DistrictSiteComponent.astro";
-import { getDistrictById, getPaginatedSitesByDistrictId } from "../../data/districts/functions";
-import { districts } from "../../data/districts/districts";
+import Layout from "../../../layouts/Layout.astro";
+import DistrictCardComponent from "../../../components/DistrictCardComponent.astro";
+import DistrictSiteComponent from "../../../components/DistrictSiteComponent.astro";
+import { getDistrictById, getPaginatedSitesByDistrictId } from "../../../data/districts/functions";
+import { districts } from "../../../data/districts/districts";
 
-export function getStaticPaths() {
-  return districts.map(district => ({
-    params: { district: district.id }
-  }));
+export async function getStaticPaths() {
+    const paths = [];
+    const sitesPerPage = 3;
+    
+    for (const district of districts) {
+        const { totalPages } = getPaginatedSitesByDistrictId(district.id, 1, sitesPerPage);
+        for (let page = 1; page <= totalPages; page++) {
+            paths.push({
+                params: { district: district.id, page: String(page) }
+            });
+        }
+    }
+
+    return paths;
 }
 
-const { district } = Astro.params;
+const { district, page } = Astro.params;
+const currentPage = parseInt(page || "1");
 const districtData = getDistrictById(district);
-
 const sitesPerPage = 10;
-const currentPage = 1;
+
 const { sites, totalPages } = getPaginatedSitesByDistrictId(district, currentPage, sitesPerPage);
 ---
 
-<Layout title={`${districtData.name || district} District`}>
+<Layout title={`${districtData?.name || district} District - Page ${currentPage}`}>
     <div class="text-sm mb-4">
         <a class="link" href="/districts">← Back to All Districts</a>
     </div>

@@ -1,9 +1,4 @@
-export interface District {
-  id: string;
-  name: string;
-  description: string;
-  image: string;
-}
+import type { District } from "./types";
 
 export const districts: District[] = [
   {
@@ -67,7 +62,3 @@ export const districts: District[] = [
     image: "/images/districts/internal/tokyo.png",
   },
 ];
-
-export const getDistrictById = (id: string): District | undefined => {
-  return districts.find((district) => district.id === id);
-};
