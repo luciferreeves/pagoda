@@ -15,6 +15,7 @@
 
     // Type Checking & Safety
     "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "types": ["vite/client"]
   }
 }

@@ -1,32 +1,31 @@
 :root {
   color-scheme: dark;
 
-  --color-bg: #0e0e14;
-  --color-surface: rgba(0, 0, 0, 0.5);
-  --color-surface-raised: rgba(255, 255, 255, 0.04);
+  --color-bg: #08080f;
+  --color-panel: #14142a;
+  --color-panel-header: #1c1c38;
+  --color-surface-hover: rgba(255, 255, 255, 0.05);
 
-  --color-text: #d4d4d8;
-  --color-text-muted: #71717a;
-  --color-text-bright: #fafafa;
+  --color-text: #c8c8d8;
+  --color-text-muted: #707088;
+  --color-text-bright: #e8e8f0;
 
-  --color-purple: #8853e7;
-  --color-purple-light: #d4c5ff;
-  --color-pink: #e42b8f;
-  --color-pink-light: #ffc8f0;
-  --color-green: #91d027;
-  --color-green-light: #cff294;
+  --color-purple: #9b6dff;
+  --color-pink: #ff6eb4;
+  --color-green: #a3e635;
+  --color-cyan: #22d3ee;
+  --color-yellow: #fbbf24;
 
-  --color-link: var(--color-pink);
-  --color-link-hover: var(--color-purple);
+  --color-link: #b0b0cc;
+  --color-link-hover: #fff;
 
-  --color-border: rgba(255, 255, 255, 0.08);
+  --color-border: #2a2a3e;
 
   --font-body: "IBM Plex Sans", sans-serif;
   --font-display: "Saira Extra Condensed", sans-serif;
 
   --width-container: 1200px;
   --width-sidebar: 200px;
-  --gap-columns: 20px;
 }
 
 @media (prefers-color-scheme: dark) {
