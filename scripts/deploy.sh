@@ -26,9 +26,15 @@ if [ -z "${NEKOWEB_API_KEY:-}" ]; then
     error "NEKOWEB_API_KEY is not set in .env"
 fi
 
+if [ -z "${NEKOWEB_SITE:-}" ]; then
+    error "NEKOWEB_SITE is not set in .env"
+fi
+
 if [ ! -d "$GARDEN_DIR" ]; then
     error "garden/ directory not found at $GARDEN_DIR"
 fi
+
+SITE_FOLDER="/${NEKOWEB_SITE}.nekoweb.org"
 
 api_post() {
     local endpoint="$1"
@@ -37,6 +43,13 @@ api_post() {
         -H "Authorization: $NEKOWEB_API_KEY" \
         "$API_BASE$endpoint" \
         "$@"
+}
+
+api_get() {
+    local endpoint="$1"
+    curl -s \
+        -H "Authorization: $NEKOWEB_API_KEY" \
+        "$API_BASE$endpoint"
 }
 
 check_response() {
@@ -53,6 +66,13 @@ check_response() {
         warn "$description - HTTP $http_code: $body"
         return 1
     fi
+}
+
+delete_remote_path() {
+    local path="$1"
+    local response
+    response=$(api_post "/files/delete" -d "pathname=$path")
+    check_response "$response" "Deleted $path"
 }
 
 create_remote_folder() {
@@ -79,7 +99,26 @@ upload_file() {
 }
 
 log "Starting deployment to nekoweb..."
+log "Site: ${NEKOWEB_SITE}.nekoweb.org"
 log "Source: $GARDEN_DIR"
+echo ""
+
+log "Cleaning root..."
+root_items=$(api_get "/files/readfolder?pathname=/")
+root_count=$(echo "$root_items" | jq 'length')
+
+if [ "$root_count" -gt 0 ]; then
+    for i in $(seq 0 $((root_count - 1))); do
+        name=$(echo "$root_items" | jq -r ".[$i].name")
+        delete_remote_path "/$name"
+    done
+else
+    log "Root is already empty"
+fi
+echo ""
+
+log "Creating site folder: $SITE_FOLDER"
+create_remote_folder "$SITE_FOLDER"
 echo ""
 
 declare -a dirs_to_create=()
@@ -93,11 +132,11 @@ while IFS= read -r -d '' file; do
     fi
 
     if [ -d "$file" ]; then
-        dirs_to_create+=("/$rel_path")
+        dirs_to_create+=("$SITE_FOLDER/$rel_path")
     elif [ -f "$file" ]; then
-        remote_dir="/$(dirname "$rel_path")"
-        if [ "$remote_dir" = "/." ]; then
-            remote_dir="/"
+        remote_dir="$SITE_FOLDER/$(dirname "$rel_path")"
+        if [ "$remote_dir" = "$SITE_FOLDER/." ]; then
+            remote_dir="$SITE_FOLDER"
         fi
         files_to_upload+=("$file|$remote_dir")
     fi
