@@ -4,6 +4,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 GARDEN_DIR="$PROJECT_ROOT/garden"
+DIST_DIR="$GARDEN_DIR/dist"
 ENV_FILE="$PROJECT_ROOT/.env"
 API_BASE="https://nekoweb.org/api"
 
@@ -35,6 +36,16 @@ if [ ! -d "$GARDEN_DIR" ]; then
 fi
 
 SITE_FOLDER="/${NEKOWEB_SITE}.nekoweb.org"
+
+log "Building garden..."
+cd "$GARDEN_DIR" && npm run build
+cd "$PROJECT_ROOT"
+
+if [ ! -d "$DIST_DIR" ]; then
+    error "Build failed: dist/ not found"
+fi
+
+echo ""
 
 api_post() {
     local endpoint="$1"
@@ -100,7 +111,7 @@ upload_file() {
 
 log "Starting deployment to nekoweb..."
 log "Site: ${NEKOWEB_SITE}.nekoweb.org"
-log "Source: $GARDEN_DIR"
+log "Source: $DIST_DIR"
 echo ""
 
 log "Cleaning root..."
@@ -125,7 +136,7 @@ declare -a dirs_to_create=()
 declare -a files_to_upload=()
 
 while IFS= read -r -d '' file; do
-    rel_path="${file#$GARDEN_DIR/}"
+    rel_path="${file#$DIST_DIR/}"
 
     if [[ "$rel_path" == .* ]]; then
         continue
@@ -140,7 +151,7 @@ while IFS= read -r -d '' file; do
         fi
         files_to_upload+=("$file|$remote_dir")
     fi
-done < <(find "$GARDEN_DIR" -mindepth 1 -print0 | sort -z)
+done < <(find "$DIST_DIR" -mindepth 1 -print0 | sort -z)
 
 if [ ${#dirs_to_create[@]} -gt 0 ]; then
     log "Creating ${#dirs_to_create[@]} directories..."

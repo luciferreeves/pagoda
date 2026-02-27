@@ -1,0 +1,6 @@
+garden/
+scripts/
+.git/
+.env
+*.md
+Makefile
