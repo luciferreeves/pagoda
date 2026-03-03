@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"time"
 
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
@@ -15,23 +14,20 @@ const prefixWidth = 15
 var (
 	loggerInstance *zap.Logger
 	level          zap.AtomicLevel
-	showTimestamp  bool
 )
 
-func timeEncoder(t time.Time, enc zapcore.PrimitiveArrayEncoder) {
-	enc.AppendString(Gray + t.Format(time.RFC3339) + Reset)
-}
-
-func levelEncoder(l zapcore.Level, enc zapcore.PrimitiveArrayEncoder) {
+func levelBadge(l logLevel) string {
 	switch l {
-	case zapcore.DebugLevel:
-		enc.AppendString(LevelColorDebug)
-	case zapcore.WarnLevel:
-		enc.AppendString(LevelColorWarn)
-	case zapcore.ErrorLevel:
-		enc.AppendString(LevelColorError)
+	case levelDebug:
+		return levelColorDebug
+	case levelWarn:
+		return levelColorWarn
+	case levelError:
+		return levelColorError
+	case levelSuccess:
+		return levelColorSuccess
 	default:
-		enc.AppendString(LevelColorInfo)
+		return levelColorInfo
 	}
 }
 
@@ -45,21 +41,21 @@ func formatPrefix(prefix string) string {
 		padding = strings.Repeat(" ", prefixWidth-len(prefix))
 	}
 
-	return Cyan + "[" + prefix + "]" + Reset + padding
+	return cyan + "[" + prefix + "]" + reset + padding
 }
 
-func colorMessage(level LogLevel, msg string) string {
-	switch level {
-	case Debug:
-		return MessageColorDebug + msg + Reset
-	case Warn:
-		return MessageColorWarn + msg + Reset
-	case Error:
-		return MessageColorError + msg + Reset
-	case Success:
-		return MessageColorSuccess + msg + Reset
+func colorMessage(l logLevel, msg string) string {
+	switch l {
+	case levelDebug:
+		return messageColorDebug + msg + reset
+	case levelWarn:
+		return messageColorWarn + msg + reset
+	case levelError:
+		return messageColorError + msg + reset
+	case levelSuccess:
+		return messageColorSuccess + msg + reset
 	default:
-		return MessageColorInfo + msg + Reset
+		return messageColorInfo + msg + reset
 	}
 }
 
@@ -67,15 +63,8 @@ func Init() {
 	level = zap.NewAtomicLevelAt(zapcore.InfoLevel)
 
 	encoderCfg := zapcore.EncoderConfig{
-		LevelKey:    "level",
-		MessageKey:  "msg",
-		LineEnding:  "\n",
-		EncodeLevel: levelEncoder,
-	}
-
-	if showTimestamp {
-		encoderCfg.TimeKey = "ts"
-		encoderCfg.EncodeTime = timeEncoder
+		MessageKey: "msg",
+		LineEnding: "\n",
 	}
 
 	encoder := zapcore.NewConsoleEncoder(encoderCfg)
@@ -92,11 +81,7 @@ func Init() {
 		})),
 	)
 
-	loggerInstance = zap.New(core, zap.AddCaller())
-}
-
-func SetTimestamp(enabled bool) {
-	showTimestamp = enabled
+	loggerInstance = zap.New(core)
 }
 
 func SetDebug(enabled bool) {
@@ -108,38 +93,38 @@ func SetDebug(enabled bool) {
 }
 
 func Debugf(prefix, format string, args ...any) {
-	log(Debug, zapcore.DebugLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelDebug, zapcore.DebugLevel, prefix, fmt.Sprintf(format, args...))
 }
 
 func Infof(prefix, format string, args ...any) {
-	log(Info, zapcore.InfoLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelInfo, zapcore.InfoLevel, prefix, fmt.Sprintf(format, args...))
 }
 
 func Successf(prefix, format string, args ...any) {
-	log(Success, zapcore.InfoLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelSuccess, zapcore.InfoLevel, prefix, fmt.Sprintf(format, args...))
 }
 
 func Warnf(prefix, format string, args ...any) {
-	log(Warn, zapcore.WarnLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelWarn, zapcore.WarnLevel, prefix, fmt.Sprintf(format, args...))
 }
 
 func Errorf(prefix, format string, args ...any) {
-	log(Error, zapcore.ErrorLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelError, zapcore.ErrorLevel, prefix, fmt.Sprintf(format, args...))
 }
 
 func Fatalf(prefix, format string, args ...any) {
-	log(Error, zapcore.ErrorLevel, prefix, fmt.Sprintf(format, args...))
+	log(levelError, zapcore.ErrorLevel, prefix, fmt.Sprintf(format, args...))
 	os.Exit(1)
 }
 
-func log(levelLabel LogLevel, zapLevel zapcore.Level, prefix string, msg any) {
+func log(label logLevel, zapLevel zapcore.Level, prefix string, msg any) {
 	if loggerInstance == nil {
 		panic("logger.Init() was not called")
 	}
 
 	message := fmt.Sprint(msg)
-	colored := colorMessage(levelLabel, message)
-	fullMessage := formatPrefix(prefix) + colored
+	colored := colorMessage(label, message)
+	fullMessage := levelBadge(label) + " " + formatPrefix(prefix) + colored
 
 	loggerInstance.Log(zapLevel, fullMessage)
 }

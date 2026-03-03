@@ -7,17 +7,17 @@ import (
 )
 
 type facade struct {
-	req types.Request
-	ctx *fiber.Ctx
+	request types.Request
+	context *fiber.Ctx
 }
 
 type required struct {
-	req types.Request
-	ctx *fiber.Ctx
+	request types.Request
+	context *fiber.Ctx
 }
 
 type withDefault struct {
-	req types.Request
-	ctx *fiber.Ctx
-	def string
+	request  types.Request
+	context  *fiber.Ctx
+	defaults string
 }

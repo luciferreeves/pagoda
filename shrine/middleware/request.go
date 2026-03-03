@@ -7,9 +7,9 @@ import (
 )
 
 func request() fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		req := meta.BuildRequest(c)
-		c.Locals(meta.RequestKey, req)
-		return c.Next()
+	return func(context *fiber.Ctx) error {
+		req := meta.BuildRequest(context)
+		context.Locals(meta.RequestKey, req)
+		return context.Next()
 	}
 }

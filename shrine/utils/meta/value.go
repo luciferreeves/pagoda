@@ -1,9 +1,9 @@
 package meta
 
 func (f facade) MustHave() required {
-	return required{req: f.req, ctx: f.ctx}
+	return required{request: f.request, context: f.context}
 }
 
-func (f facade) Default(def string) withDefault {
-	return withDefault{req: f.req, ctx: f.ctx, def: def}
+func (f facade) Default(defaults string) withDefault {
+	return withDefault{request: f.request, context: f.context, defaults: defaults}
 }

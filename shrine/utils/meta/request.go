@@ -7,20 +7,20 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const RequestKey = "__request_ctx"
+const RequestKey = "__request_context"
 
-func Request(c *fiber.Ctx) facade {
-	req, ok := c.Locals(RequestKey).(types.Request)
+func Request(context *fiber.Ctx) facade {
+	request, ok := context.Locals(RequestKey).(types.Request)
 	if !ok {
 		logger.Errorf("META", "RequestContext missing in fiber locals")
 		return facade{}
 	}
-	return facade{req: req, ctx: c}
+	return facade{request: request, context: context}
 }
 
 func (f facade) Param(key string) (string, bool) {
-	if f.ctx != nil {
-		val := f.ctx.Params(key)
+	if f.context != nil {
+		val := f.context.Params(key)
 		if val != "" {
 			return val, true
 		}
@@ -29,7 +29,7 @@ func (f facade) Param(key string) (string, bool) {
 }
 
 func (f facade) Query(key string) (string, bool) {
-	for _, q := range f.req.Query {
+	for _, q := range f.request.Query {
 		if q.Key == key {
 			return q.Value, true
 		}
@@ -38,7 +38,7 @@ func (f facade) Query(key string) (string, bool) {
 }
 
 func (f facade) Header(key string) (string, bool) {
-	for _, h := range f.req.Headers {
+	for _, h := range f.request.Headers {
 		if h.Key == key {
 			return h.Value, true
 		}
@@ -48,8 +48,8 @@ func (f facade) Header(key string) (string, bool) {
 
 func (r required) Param(key string) string {
 	// Access params directly from fiber context (available after route matching)
-	if r.ctx != nil {
-		val := r.ctx.Params(key)
+	if r.context != nil {
+		val := r.context.Params(key)
 		if val != "" {
 			return val
 		}
@@ -59,7 +59,7 @@ func (r required) Param(key string) string {
 }
 
 func (r required) Query(key string) string {
-	for _, q := range r.req.Query {
+	for _, q := range r.request.Query {
 		if q.Key == key {
 			return q.Value
 		}
@@ -69,7 +69,7 @@ func (r required) Query(key string) string {
 }
 
 func (r required) Header(key string) string {
-	for _, h := range r.req.Headers {
+	for _, h := range r.request.Headers {
 		if h.Key == key {
 			return h.Value
 		}
@@ -79,29 +79,29 @@ func (r required) Header(key string) string {
 }
 
 func (d withDefault) Param(key string) string {
-	if d.ctx != nil {
-		val := d.ctx.Params(key)
+	if d.context != nil {
+		val := d.context.Params(key)
 		if val != "" {
 			return val
 		}
 	}
-	return d.def
+	return d.defaults
 }
 
 func (d withDefault) Query(key string) string {
-	for _, q := range d.req.Query {
+	for _, q := range d.request.Query {
 		if q.Key == key {
 			return q.Value
 		}
 	}
-	return d.def
+	return d.defaults
 }
 
 func (d withDefault) Header(key string) string {
-	for _, h := range d.req.Headers {
+	for _, h := range d.request.Headers {
 		if h.Key == key {
 			return h.Value
 		}
 	}
-	return d.def
+	return d.defaults
 }

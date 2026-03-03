@@ -11,16 +11,16 @@ import (
 )
 
 func httpLogger() fiber.Handler {
-	return func(c *fiber.Ctx) error {
+	return func(context *fiber.Ctx) error {
 		start := time.Now()
 
-		err := c.Next()
+		err := context.Next()
 
 		duration := time.Since(start)
-		status := c.Response().StatusCode()
-		method := c.Method()
-		path := c.Path()
-		ip := c.IP()
+		status := context.Response().StatusCode()
+		method := context.Method()
+		path := context.Path()
+		ip := context.IP()
 
 		// Pad method for alignment
 		paddedMethod := method

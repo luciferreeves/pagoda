@@ -6,9 +6,9 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func buildQueryParams(c *fiber.Ctx) []types.HTTPParam {
+func buildQueryParams(context *fiber.Ctx) []types.HTTPParam {
 	params := make([]types.HTTPParam, 0)
-	c.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+	context.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
 		params = append(params, types.HTTPParam{
 			Key:   string(k),
 			Value: string(v),
@@ -17,9 +17,9 @@ func buildQueryParams(c *fiber.Ctx) []types.HTTPParam {
 	return params
 }
 
-func buildRouteParams(c *fiber.Ctx) []types.HTTPParam {
+func buildRouteParams(context *fiber.Ctx) []types.HTTPParam {
 	params := make([]types.HTTPParam, 0)
-	for k, v := range c.AllParams() {
+	for k, v := range context.AllParams() {
 		params = append(params, types.HTTPParam{
 			Key:   k,
 			Value: v,
@@ -28,9 +28,9 @@ func buildRouteParams(c *fiber.Ctx) []types.HTTPParam {
 	return params
 }
 
-func buildHeaders(c *fiber.Ctx) []types.HTTPParam {
+func buildHeaders(context *fiber.Ctx) []types.HTTPParam {
 	params := make([]types.HTTPParam, 0)
-	c.Request().Header.VisitAll(func(k, v []byte) {
+	context.Request().Header.VisitAll(func(k, v []byte) {
 		params = append(params, types.HTTPParam{
 			Key:   string(k),
 			Value: string(v),

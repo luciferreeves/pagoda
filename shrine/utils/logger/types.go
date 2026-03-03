@@ -1,29 +1,28 @@
 package logger
 
-type LogLevel string
+type logLevel string
 
 const (
-	Debug   LogLevel = "debug"
-	Info    LogLevel = "info"
-	Warn    LogLevel = "warn"
-	Error   LogLevel = "error"
-	Success LogLevel = "success"
+	levelDebug   logLevel = "debug"
+	levelInfo    logLevel = "info"
+	levelWarn    logLevel = "warn"
+	levelError   logLevel = "error"
+	levelSuccess logLevel = "success"
 )
 
 const (
-	Reset = "\033[0m"
-	Cyan  = "\033[36m"
-	Gray  = "\033[90m"
+	reset = "\033[0m"
+	cyan  = "\033[36m"
 
-	LevelColorInfo    = "\033[34mINFO   \033[0m"
-	LevelColorWarn    = "\033[33mWARN   \033[0m"
-	LevelColorError   = "\033[31mERROR  \033[0m"
-	LevelColorDebug   = "\033[35mDEBUG  \033[0m"
-	LevelColorSuccess = "\033[32mSUCCESS\033[0m"
+	levelColorInfo    = "\033[34mINFO   \033[0m"
+	levelColorWarn    = "\033[33mWARN   \033[0m"
+	levelColorError   = "\033[31mERROR  \033[0m"
+	levelColorDebug   = "\033[35mDEBUG  \033[0m"
+	levelColorSuccess = "\033[32mSUCCESS\033[0m"
 
-	MessageColorInfo    = "\033[97m"
-	MessageColorWarn    = "\033[33m"
-	MessageColorError   = "\033[31m"
-	MessageColorDebug   = "\033[90m"
-	MessageColorSuccess = "\033[32m"
+	messageColorInfo    = "\033[97m"
+	messageColorWarn    = "\033[33m"
+	messageColorError   = "\033[31m"
+	messageColorDebug   = "\033[90m"
+	messageColorSuccess = "\033[32m"
 )
