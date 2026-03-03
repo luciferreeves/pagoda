@@ -7,10 +7,10 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-const requestKey = "__request_ctx"
+const RequestKey = "__request_ctx"
 
 func Request(c *fiber.Ctx) facade {
-	req, ok := c.Locals(requestKey).(types.Request)
+	req, ok := c.Locals(RequestKey).(types.Request)
 	if !ok {
 		logger.Errorf("META", "RequestContext missing in fiber locals")
 		return facade{}

@@ -19,9 +19,10 @@ import (
 func main() {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
+		ErrorHandler:          router.ErrorHandler,
 	})
 	app.Use(cors.New(cors.Config{
-		AllowOrigins:  "*",
+		AllowOrigins:  config.Server.CorsOrigins,
 		AllowMethods:  "GET, HEAD, PUT, PATCH, POST, DELETE, OPTIONS",
 		AllowHeaders:  "Origin, Content-Type, Accept, Authorization, X-Requested-With, X-API-Key, X-CSRF-Token",
 		ExposeHeaders: "Content-Length, Content-Type, Content-Disposition, X-Pagination, X-Total-Count",

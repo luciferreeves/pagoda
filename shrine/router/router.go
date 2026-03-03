@@ -1,7 +1,7 @@
 package router
 
 import (
-	controllers "shrine/controllers"
+	"shrine/controllers"
 	"shrine/utils/urls"
 
 	"github.com/gofiber/fiber/v2"

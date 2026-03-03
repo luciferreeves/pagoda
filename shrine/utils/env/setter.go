@@ -1,7 +1,6 @@
 package env
 
 import (
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -32,13 +31,7 @@ func setFieldFromEnv(field reflect.Value, envKey, defaultVal string) {
 }
 
 func setUintField(field reflect.Value, envKey string, defaultVal uint64) {
-	if value := os.Getenv(envKey); value != "" {
-		if parsed, err := strconv.ParseUint(value, 10, 64); err == nil {
-			field.SetUint(parsed)
-			return
-		}
-	}
-	field.SetUint(defaultVal)
+	field.SetUint(getEnvUint(envKey, defaultVal))
 }
 
 func setDurationField(field reflect.Value, envKey, defaultVal string) {
@@ -62,46 +55,5 @@ func setSliceField(field reflect.Value, envKey, defaultVal string) {
 		}
 		result := getEnvStringSlice(envKey, defaultSlice)
 		field.Set(reflect.ValueOf(result))
-	}
-}
-
-func setFieldDefault(field reflect.Value, defaultVal string) {
-	switch field.Kind() {
-	case reflect.String:
-		field.SetString(defaultVal)
-	case reflect.Bool:
-		if defaultBool, err := strconv.ParseBool(defaultVal); err == nil {
-			field.SetBool(defaultBool)
-		}
-	case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-		if defaultInt, err := strconv.ParseInt(defaultVal, 10, 64); err == nil {
-			field.SetInt(defaultInt)
-		}
-	case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64:
-		if defaultUint, err := strconv.ParseUint(defaultVal, 10, 64); err == nil {
-			field.SetUint(defaultUint)
-		}
-	case reflect.Float32, reflect.Float64:
-		if defaultFloat, err := strconv.ParseFloat(defaultVal, 64); err == nil {
-			field.SetFloat(defaultFloat)
-		}
-	case reflect.Slice:
-		if field.Type().Elem().Kind() == reflect.String && defaultVal != "" {
-			parts := strings.Split(defaultVal, ",")
-			result := make([]string, 0, len(parts))
-			for _, part := range parts {
-				trimmed := strings.TrimSpace(part)
-				if trimmed != "" {
-					result = append(result, trimmed)
-				}
-			}
-			field.Set(reflect.ValueOf(result))
-		}
-	default:
-		if field.Type() == reflect.TypeFor[time.Duration]() {
-			if defaultDuration, err := time.ParseDuration(defaultVal); err == nil {
-				field.Set(reflect.ValueOf(defaultDuration))
-			}
-		}
 	}
 }

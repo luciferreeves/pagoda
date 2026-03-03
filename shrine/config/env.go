@@ -1,10 +1,11 @@
 package config
 
 type server struct {
-	Host   string `env:"HOST" default:"0.0.0.0"`
-	Port   int    `env:"PORT" default:"3000"`
-	Secret string `env:"SECRET" default:"pagoda-secret"`
-	Debug  bool   `env:"DEBUG" default:"false"`
+	Host        string `env:"HOST" default:"0.0.0.0"`
+	Port        int    `env:"PORT" default:"3000"`
+	Secret      string `env:"SECRET" default:"pagoda-secret"`
+	Debug       bool   `env:"DEBUG" default:"false"`
+	CorsOrigins string `env:"CORS_ORIGINS" default:"*"`
 }
 
 type database struct {

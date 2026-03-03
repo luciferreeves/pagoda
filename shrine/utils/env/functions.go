@@ -2,7 +2,6 @@ package env
 
 import (
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -66,32 +65,11 @@ func getEnvStringSlice(key string, defaultVal []string) []string {
 	return defaultVal
 }
 
-func Defaults[T any](config *T) *T {
-	v := reflect.ValueOf(config)
-	if v.Kind() != reflect.Ptr || v.Elem().Kind() != reflect.Struct {
-		return config
-	}
-
-	elem := v.Elem()
-	t := elem.Type()
-	newStruct := reflect.New(t)
-	newElem := newStruct.Elem()
-
-	for i := range elem.NumField() {
-		field := newElem.Field(i)
-		fieldType := t.Field(i)
-
-		if !field.CanSet() {
-			continue
+func getEnvUint(key string, defaultVal uint64) uint64 {
+	if value := os.Getenv(key); value != "" {
+		if parsed, err := strconv.ParseUint(value, 10, 64); err == nil {
+			return parsed
 		}
-
-		defaultVal := fieldType.Tag.Get("default")
-		if defaultVal == "" {
-			continue
-		}
-
-		setFieldDefault(field, defaultVal)
 	}
-
-	return newStruct.Interface().(*T)
+	return defaultVal
 }
