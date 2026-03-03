@@ -4,7 +4,7 @@ dev-garden:
 	cd garden && npm run dev
 
 dev-shrine:
-	cd shrine && go run .
+	cd shrine && make dev
 
 build-garden:
 	cd garden && npm run build
