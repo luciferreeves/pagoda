@@ -42,3 +42,11 @@ func DefaultError(context *fiber.Ctx, err error) error {
 		Error: err.Error(),
 	}).As(fiber.StatusInternalServerError)
 }
+
+func Success(context *fiber.Ctx, data any) error {
+	return shortcuts.Response(context, data).As(fiber.StatusOK)
+}
+
+func Created(context *fiber.Ctx, data any) error {
+	return shortcuts.Response(context, data).As(fiber.StatusCreated)
+}

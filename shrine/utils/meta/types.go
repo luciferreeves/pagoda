@@ -7,7 +7,7 @@ import (
 )
 
 type facade struct {
-	request types.Request
+	types.Request
 	context *fiber.Ctx
 }
 

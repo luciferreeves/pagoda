@@ -15,7 +15,7 @@ func Request(context *fiber.Ctx) facade {
 		logger.Errorf("META", "RequestContext missing in fiber locals")
 		return facade{}
 	}
-	return facade{request: request, context: context}
+	return facade{Request: request, context: context}
 }
 
 func (f facade) Param(key string) (string, bool) {
@@ -29,7 +29,7 @@ func (f facade) Param(key string) (string, bool) {
 }
 
 func (f facade) Query(key string) (string, bool) {
-	for _, q := range f.request.Query {
+	for _, q := range f.Request.Query {
 		if q.Key == key {
 			return q.Value, true
 		}
@@ -38,7 +38,7 @@ func (f facade) Query(key string) (string, bool) {
 }
 
 func (f facade) Header(key string) (string, bool) {
-	for _, h := range f.request.Headers {
+	for _, h := range f.Request.Headers {
 		if h.Key == key {
 			return h.Value, true
 		}
