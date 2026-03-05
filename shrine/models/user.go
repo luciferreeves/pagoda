@@ -27,8 +27,11 @@ type User struct {
 	Pronouns        string         `gorm:"size:50"`
 	Signature       string         `gorm:"size:500"`
 	Role            enums.UserRole `gorm:"size:20;not null;default:member"`
-	EmailVerified   bool           `gorm:"not null;default:false"`
-	AccountBanned   bool           `gorm:"not null;default:false"`
+	EmailVerified      bool       `gorm:"not null;default:false"`
+	VerificationHash   string     `gorm:"size:64"`
+	VerificationExpiry *time.Time
+	VerificationType   enums.VerificationType `gorm:"size:20"`
+	AccountBanned      bool       `gorm:"not null;default:false"`
 	BannedAt        *time.Time
 	BannedReason    string `gorm:"size:500"`
 	BannedBy        *uint  `gorm:"index"`
@@ -80,7 +83,24 @@ func (user *User) IsDisabled() bool {
 }
 
 func (user *User) CanAuthenticate() bool {
-	return !user.AccountBanned && !user.AccountDisabled && user.EmailVerified
+	return !user.AccountBanned && !user.AccountDisabled
+}
+
+func (user *User) IsVerified() bool {
+	return user.EmailVerified
+}
+
+func (user *User) SetVerification(hash string, expiry time.Time, verificationType enums.VerificationType) {
+	user.VerificationHash = hash
+	user.VerificationExpiry = &expiry
+	user.VerificationType = verificationType
+}
+
+func (user *User) VerifyEmail() {
+	user.EmailVerified = true
+	user.VerificationHash = ""
+	user.VerificationExpiry = nil
+	user.VerificationType = ""
 }
 
 func (user *User) ToResponse() types.UserResponse {

@@ -15,3 +15,12 @@ type database struct {
 	Driver string `env:"DB_DRIVER" default:"sqlite"`
 	DSN    string `env:"DSN" default:"pagoda.db"`
 }
+
+type smtp struct {
+	Host        string `env:"SMTP_HOST" default:"localhost"`
+	Port        int    `env:"SMTP_PORT" default:"587"`
+	Username    string `env:"SMTP_USERNAME" default:""`
+	Password    string `env:"SMTP_PASSWORD" default:""`
+	From        string `env:"SMTP_FROM" default:"noreply@pagoda.local"`
+	FrontendURL string `env:"FRONTEND_URL" default:"http://localhost:5173"`
+}
