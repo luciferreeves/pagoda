@@ -2,7 +2,7 @@ import type { JSX } from "solid-js";
 
 interface NavSectionProps {
   title: string;
-  accent?: "cyan" | "green" | "pink" | "purple" | "yellow";
+  accent?: "cyan" | "green" | "pink" | "purple" | "red" | "yellow";
   children: JSX.Element;
 }
 

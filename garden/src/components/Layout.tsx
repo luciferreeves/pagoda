@@ -3,6 +3,7 @@ import { A } from "@solidjs/router";
 import Sidebar from "./Sidebar";
 import NavSection from "./NavSection";
 import { auth } from "../store/auth";
+import { UserRole } from "../types/roles";
 
 interface LayoutProps {
   children: JSX.Element;
@@ -40,8 +41,17 @@ export default function Layout(props: LayoutProps) {
                   <li><A href="/register">Register</A></li>
                 </>
               }>
-                <li><A href="/account">My Account</A></li>
-                <li><button type="button" class="sidebar-logout" onClick={() => auth.logout()}>Log Out</button></li>
+                {((user) => (
+                  <>
+                    <li><A href="/account">Account</A></li>
+                    <li><A href={`/u/${user.username}`}>My Page</A></li>
+                    <li><A href="/letters">Letters</A></li>
+                    <li><A href="/notifications">Notifications</A></li>
+                    <li><A href="/friends">Friends</A></li>
+                    <li><A href="/account/settings">Settings</A></li>
+                    <li><button type="button" class="sidebar-logout" onClick={() => auth.logout()}>Log Out</button></li>
+                  </>
+                ))(auth.user()!)}
               </Show>
             </ul>
           </NavSection>
@@ -49,17 +59,34 @@ export default function Layout(props: LayoutProps) {
             <ul>
               <li><A href="/members">Members</A></li>
               <li><A href="/online">Who's Online</A></li>
-              <li><A href="/buttons">Button Wall</A></li>
               <li><A href="/random">Random Member</A></li>
+              <li><A href="/clubs">Clubs</A></li>
+              <li><A href="/interests">Interests</A></li>
             </ul>
           </NavSection>
           <NavSection title="Services" accent="green">
             <ul>
-              <li><A href="/webring">Webring</A></li>
-              <li><A href="/guestbook">Guestbook</A></li>
-              <li><A href="/hitcounter">Hit Counter</A></li>
+              <li><A href="/caravan">Caravan</A></li>
+              <li><A href="/ledger">Ledger</A></li>
+              <li><A href="/census">Census</A></li>
+              <li><A href="/pamphlet">Pamphlet</A></li>
             </ul>
           </NavSection>
+          <Show when={auth.user()?.role === UserRole.Admin || auth.user()?.role === UserRole.Moderator}>
+            <NavSection title="Council" accent="red">
+              <ul>
+                <li><A href="/council/users">Users</A></li>
+                <li><A href="/council/reports">Reports</A></li>
+                <li><A href="/council/forums">Forums</A></li>
+                <li><A href="/council/districts">Districts</A></li>
+                <li><A href="/council/bazaar">Bazaar</A></li>
+                <Show when={auth.user()?.role === UserRole.Admin}>
+                  <li><A href="/council/audit-log">Audit Log</A></li>
+                  <li><A href="/council/announcements">Announcements</A></li>
+                </Show>
+              </ul>
+            </NavSection>
+          </Show>
         </Sidebar>
 
         <main class="content">

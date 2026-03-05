@@ -11,15 +11,27 @@
   --color-text-bright: #e8e8f0;
 
   --color-purple: #9b6dff;
+  --color-purple-hover: #8a5cf0;
   --color-pink: #ff6eb4;
   --color-green: #a3e635;
   --color-cyan: #22d3ee;
   --color-yellow: #fbbf24;
+  --color-red: #f87171;
+  --color-error: #ff6b6b;
+  --color-white: #fff;
 
   --color-link: #b0b0cc;
-  --color-link-hover: #fff;
+  --color-link-hover: var(--color-white);
 
   --color-border: #2a2a3e;
+
+  --color-header-title: rgba(224, 212, 245, 0.88);
+  --color-header-subtitle: #a898c0;
+  --color-header-glow-inner: rgba(155, 109, 255, 0.2);
+  --color-header-glow-outer: rgba(140, 90, 255, 0.08);
+
+  --color-overlay-light: rgba(255, 255, 255, 0.02);
+  --color-overlay-lighter: rgba(255, 255, 255, 0.03);
 
   --font-body: "IBM Plex Sans", sans-serif;
   --font-display: "Saira Extra Condensed", sans-serif;
