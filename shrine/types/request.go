@@ -14,4 +14,9 @@ type LoginRequest struct {
 
 type VerifyRequest struct {
 	Token string `json:"token"`
+	Type  string `json:"type"`
+}
+
+type ResendActivationRequest struct {
+	Email string `json:"email"`
 }

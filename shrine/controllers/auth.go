@@ -99,14 +99,21 @@ func VerifyController(context *fiber.Ctx) error {
 		return BadRequest(context, errors.New("Verification token is required."))
 	}
 
+	verificationType := enums.VerificationType(body.Type)
+
 	tokenHash := auth.HashToken(body.Token)
 
-	user, err := repositories.FindUserByVerification(tokenHash, enums.Activation)
+	user, err := repositories.FindUserByVerification(tokenHash, verificationType)
 	if err != nil {
 		return BadRequest(context, errors.New("Your verification link is invalid or has expired."))
 	}
 
-	user.VerifyEmail()
+	switch verificationType {
+	case enums.Activation:
+		user.VerifyEmail()
+	default:
+		return BadRequest(context, errors.New("Invalid verification type."))
+	}
 
 	if err := repositories.UpdateUser(user); err != nil {
 		return InternalServerError(context, errors.New("Failed to verify your account."))
@@ -114,6 +121,41 @@ func VerifyController(context *fiber.Ctx) error {
 
 	return Success(context, types.MessageResponse{
 		Message: "Your email has been verified successfully. You can now log in.",
+	})
+}
+
+func ResendActivationController(context *fiber.Ctx) error {
+	body, err := meta.Body[types.ResendActivationRequest](context)
+	if err != nil {
+		return BadRequest(context, errors.New("Invalid request body."))
+	}
+
+	user, err := repositories.FindUserByEmail(body.Email)
+	if err != nil {
+		return BadRequest(context, errors.New("No account exists with that email address."))
+	}
+
+	if user.IsVerified() {
+		return BadRequest(context, errors.New("This account has already been verified."))
+	}
+
+	token, err := auth.GenerateToken()
+	if err != nil {
+		return InternalServerError(context, errors.New("Failed to generate verification token."))
+	}
+
+	user.SetVerification(auth.HashToken(token), time.Now().Add(24*time.Hour), enums.Activation)
+
+	if err := repositories.UpdateUser(user); err != nil {
+		return InternalServerError(context, errors.New("Failed to store verification token."))
+	}
+
+	if err := emails.SendActivation(user.Email, user.Username, token); err != nil {
+		logger.Errorf("Auth", "Failed to send verification email to %s: %v", user.Email, err)
+	}
+
+	return Success(context, types.MessageResponse{
+		Message: "A new verification email has been sent. Please check your inbox.",
 	})
 }
 
