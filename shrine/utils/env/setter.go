@@ -8,6 +8,11 @@ import (
 )
 
 func setFieldFromEnv(field reflect.Value, envKey, defaultVal string) {
+	if field.Type() == reflect.TypeFor[time.Duration]() {
+		setDurationField(field, envKey, defaultVal)
+		return
+	}
+
 	switch field.Kind() {
 	case reflect.String:
 		field.SetString(getEnv(envKey, defaultVal))
@@ -25,8 +30,6 @@ func setFieldFromEnv(field reflect.Value, envKey, defaultVal string) {
 		field.SetFloat(getEnvFloat(envKey, defaultFloat))
 	case reflect.Slice:
 		setSliceField(field, envKey, defaultVal)
-	default:
-		setDurationField(field, envKey, defaultVal)
 	}
 }
 

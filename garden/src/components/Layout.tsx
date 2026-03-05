@@ -1,13 +1,16 @@
-import type { JSX } from "solid-js";
+import { type JSX, Show, onMount } from "solid-js";
 import { A } from "@solidjs/router";
 import Sidebar from "./Sidebar";
 import NavSection from "./NavSection";
+import { auth } from "../store/auth";
 
 interface LayoutProps {
   children: JSX.Element;
 }
 
 export default function Layout(props: LayoutProps) {
+  onMount(() => auth.initialize());
+
   return (
     <>
       <header class="site-header">
@@ -31,8 +34,15 @@ export default function Layout(props: LayoutProps) {
         <Sidebar>
           <NavSection title="Account" accent="pink">
             <ul>
-              <li><A href="/login">Log In</A></li>
-              <li><A href="/register">Register</A></li>
+              <Show when={auth.user()} fallback={
+                <>
+                  <li><A href="/login">Log In</A></li>
+                  <li><A href="/register">Register</A></li>
+                </>
+              }>
+                <li><A href="/account">My Account</A></li>
+                <li><button type="button" class="sidebar-logout" onClick={() => auth.logout()}>Log Out</button></li>
+              </Show>
             </ul>
           </NavSection>
           <NavSection title="Community" accent="cyan">
