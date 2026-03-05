@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"shrine/enums"
+	"strings"
 	"shrine/models"
 	"shrine/repositories"
 	"shrine/types"
@@ -32,6 +33,12 @@ func RegisterController(context *fiber.Ctx) error {
 	}
 
 	if err := repositories.CreateUser(&user); err != nil {
+		if strings.Contains(err.Error(), "users.username") {
+			return BadRequest(context, errors.New("An account with that username already exists."))
+		}
+		if strings.Contains(err.Error(), "users.email") {
+			return BadRequest(context, errors.New("An account with that email address already exists."))
+		}
 		return BadRequest(context, err)
 	}
 

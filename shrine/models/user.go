@@ -1,7 +1,7 @@
 package models
 
 import (
-	"fmt"
+	"errors"
 	"shrine/enums"
 	"shrine/types"
 	"shrine/utils/validators"
@@ -45,10 +45,10 @@ type User struct {
 
 func (user *User) SetPassword(password string) error {
 	if len(password) < 8 {
-		return fmt.Errorf("password must be at least 8 characters")
+		return errors.New("Password must be at least 8 characters.")
 	}
 	if len(password) > 255 {
-		return fmt.Errorf("password must be at most 255 characters")
+		return errors.New("Password must be at most 255 characters.")
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -127,23 +127,23 @@ func (user *User) BeforeCreate(tx *gorm.DB) error {
 
 	if !bypassUsername {
 		if !validators.IsValidUsername(user.Username, 3) {
-			return fmt.Errorf("username must be 3-32 characters, alphanumeric and underscores only")
+			return errors.New("Username must be 3-32 characters and can only contain letters, numbers, and underscores.")
 		}
 		if validators.IsReservedUsername(user.Username) {
-			return fmt.Errorf("username is reserved")
+			return errors.New("This username is not available.")
 		}
 	}
 
 	if !validators.IsValidEmail(user.Email) {
-		return fmt.Errorf("invalid email format")
+		return errors.New("Please enter a valid email address.")
 	}
 
 	if len(strings.TrimSpace(user.DisplayName)) < 1 || len(strings.TrimSpace(user.DisplayName)) > 50 {
-		return fmt.Errorf("display name must be between 1 and 50 characters")
+		return errors.New("Display name must be between 1 and 50 characters.")
 	}
 
 	if user.PasswordHash == "" {
-		return fmt.Errorf("password is required")
+		return errors.New("Password is required.")
 	}
 
 	user.Email = strings.ToLower(strings.TrimSpace(user.Email))
@@ -155,11 +155,11 @@ func (user *User) BeforeCreate(tx *gorm.DB) error {
 
 func (user *User) BeforeUpdate(tx *gorm.DB) error {
 	if !validators.IsValidEmail(user.Email) {
-		return fmt.Errorf("invalid email format")
+		return errors.New("Please enter a valid email address.")
 	}
 
 	if len(strings.TrimSpace(user.DisplayName)) < 1 || len(strings.TrimSpace(user.DisplayName)) > 50 {
-		return fmt.Errorf("display name must be between 1 and 50 characters")
+		return errors.New("Display name must be between 1 and 50 characters.")
 	}
 
 	user.Email = strings.ToLower(strings.TrimSpace(user.Email))
