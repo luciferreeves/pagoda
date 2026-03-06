@@ -11,6 +11,7 @@ var (
 	Server   server
 	Database database
 	SMTP     smtp
+	Storage  storage
 )
 
 func init() {
@@ -30,6 +31,10 @@ func init() {
 
 	if err := env.Parse(&SMTP); err != nil {
 		logger.Fatalf("Config", "Failed to parse SMTP config: %v", err)
+	}
+
+	if err := env.Parse(&Storage); err != nil {
+		logger.Fatalf("Config", "Failed to parse storage config: %v", err)
 	}
 
 	if Server.Debug {

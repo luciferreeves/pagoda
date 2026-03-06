@@ -312,16 +312,17 @@ a:hover {
 }
 
 .nav-section-body li {
-  padding: 3px 8px 3px 16px;
+  padding: 3px 8px;
   font-size: 12px;
-  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .nav-section-body li::before {
   content: "\25B8";
-  position: absolute;
-  left: 6px;
   font-size: 10px;
+  flex-shrink: 0;
   color: var(--color-text-muted);
 }
 
@@ -409,7 +410,6 @@ a:hover {
 .nav-section-body li.placeholder {
   color: var(--color-text-muted);
   font-style: italic;
-  padding: 3px 8px;
 }
 
 .nav-section-body li.placeholder::before {
@@ -525,4 +525,17 @@ a:hover {
 
 .sidebar-logout:hover {
   color: var(--color-pink);
+}
+
+.citizen-item a {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.citizen-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  object-fit: cover;
 }

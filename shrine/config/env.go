@@ -24,3 +24,12 @@ type smtp struct {
 	From        string `env:"SMTP_FROM" default:"noreply@pagoda.local"`
 	FrontendURL string `env:"FRONTEND_URL" default:"http://localhost:5173"`
 }
+
+type storage struct {
+	Endpoint  string `env:"MINIO_ENDPOINT" default:"localhost:9000"`
+	AccessKey string `env:"MINIO_ACCESS_KEY" default:""`
+	SecretKey string `env:"MINIO_SECRET_KEY" default:""`
+	Bucket    string `env:"MINIO_BUCKET" default:"pagoda"`
+	UseSSL    bool   `env:"MINIO_USE_SSL" default:"false"`
+	CDN       string `env:"CDN_URL" default:""`
+}

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"shrine/enums"
 	"shrine/types"
+	"shrine/utils/storage"
 	"shrine/utils/validators"
 	"strings"
 	"time"
@@ -20,7 +21,7 @@ type User struct {
 	DisplayName     string         `gorm:"size:50;not null"`
 	Bio             string         `gorm:"size:500"`
 	Birthday        *time.Time
-	AvatarURL       string         `gorm:"size:512"`
+	AvatarURL       string         `gorm:"size:512;not null;default:defaults/avatar.png"`
 	BlinkieURL      string         `gorm:"size:512"`
 	Website         string         `gorm:"size:255"`
 	Location        string         `gorm:"size:100"`
@@ -111,8 +112,8 @@ func (user *User) ToResponse() types.UserResponse {
 		DisplayName: user.DisplayName,
 		Bio:         user.Bio,
 		Birthday:    user.Birthday,
-		AvatarURL:   user.AvatarURL,
-		BlinkieURL:  user.BlinkieURL,
+		AvatarURL:   storage.ResolveCDN(user.AvatarURL),
+		BlinkieURL:  storage.ResolveCDN(user.BlinkieURL),
 		Website:     user.Website,
 		Location:    user.Location,
 		Pronouns:    user.Pronouns,
@@ -127,7 +128,7 @@ func (user *User) ToSummary() types.CitizenSummary {
 		ID:          user.ID,
 		Username:    user.Username,
 		DisplayName: user.DisplayName,
-		AvatarURL:   user.AvatarURL,
+		AvatarURL:   storage.ResolveCDN(user.AvatarURL),
 	}
 }
 

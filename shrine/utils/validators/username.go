@@ -26,7 +26,7 @@ var reservedUsernames = collections.SetOf(
 	"members", "online", "buttons", "webring",
 	"guestbook", "hitcounter", "letters",
 	"rules", "faq", "blog", "news", "feed",
-	"static", "assets", "uploads", "images", "media",
+	"static", "assets", "uploads", "images", "media", "default", "defaults",
 	"test", "testing", "debug", "dev", "staging",
 	"everyone", "all", "here", "channel",
 )

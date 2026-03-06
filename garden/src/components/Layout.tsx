@@ -125,7 +125,14 @@ export default function Layout(props: LayoutProps) {
                 <li class="placeholder">Be the first to join!</li>
               }>
                 <For each={stats.data()?.newest_citizens}>
-                  {(citizen) => <li><A href={`/u/${citizen.username}`}>{citizen.display_name}</A></li>}
+                  {(citizen) => (
+                    <li class="citizen-item">
+                      <A href={`/u/${citizen.username}`}>
+                        <img src={citizen.avatar_url} alt="" class="citizen-avatar" />
+                        {citizen.display_name}
+                      </A>
+                    </li>
+                  )}
                 </For>
               </Show>
             </ul>
@@ -136,7 +143,14 @@ export default function Layout(props: LayoutProps) {
                 <li class="placeholder">No one online.</li>
               }>
                 <For each={stats.data()?.online_citizens}>
-                  {(citizen) => <li><A href={`/u/${citizen.username}`}>{citizen.display_name}</A></li>}
+                  {(citizen) => (
+                    <li class="citizen-item">
+                      <A href={`/u/${citizen.username}`}>
+                        <img src={citizen.avatar_url} alt="" class="citizen-avatar" />
+                        {citizen.display_name}
+                      </A>
+                    </li>
+                  )}
                 </For>
               </Show>
             </ul>
