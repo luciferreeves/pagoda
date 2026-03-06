@@ -90,7 +90,7 @@ export default function Layout(props: LayoutProps) {
               <li><A href="/pamphlet">Pamphlet</A></li>
             </ul>
           </NavSection>
-          <Show when={auth.user()?.role === UserRole.Admin || auth.user()?.role === UserRole.Moderator}>
+          <Show when={auth.user()?.role === UserRole.Owner || auth.user()?.role === UserRole.Admin || auth.user()?.role === UserRole.Moderator}>
             <NavSection title="Council" accent="red">
               <ul>
                 <li><A href="/council/users">Users</A></li>
@@ -98,7 +98,7 @@ export default function Layout(props: LayoutProps) {
                 <li><A href="/council/forums">Forums</A></li>
                 <li><A href="/council/districts">Districts</A></li>
                 <li><A href="/council/bazaar">Bazaar</A></li>
-                <Show when={auth.user()?.role === UserRole.Admin}>
+                <Show when={auth.user()?.role === UserRole.Owner || auth.user()?.role === UserRole.Admin}>
                   <li><A href="/council/audit-log">Audit Log</A></li>
                   <li><A href="/council/announcements">Announcements</A></li>
                 </Show>

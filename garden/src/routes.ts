@@ -9,5 +9,7 @@ export const routes: RouteDefinition[] = [
   { path: "/register", component: lazy(() => import("./pages/register")) },
   { path: "/account/verify", component: lazy(() => import("./pages/account/verify")) },
   { path: "/account/reactivate", component: lazy(() => import("./pages/account/reactivate")) },
+  { path: "/council/users", component: lazy(() => import("./pages/council/users")) },
+  { path: "/council/users/:username", component: lazy(() => import("./pages/council/user")) },
   { path: "**", component: lazy(() => import("./errors/404")) },
 ];

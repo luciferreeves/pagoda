@@ -63,8 +63,12 @@ func (user *User) CheckPassword(password string) bool {
 	return bcrypt.CompareHashAndPassword([]byte(user.PasswordHash), []byte(password)) == nil
 }
 
+func (user *User) IsOwner() bool {
+	return user.Role == enums.Owner
+}
+
 func (user *User) IsAdmin() bool {
-	return user.Role == enums.Admin
+	return user.Role == enums.Admin || user.IsOwner()
 }
 
 func (user *User) IsModerator() bool {
@@ -106,7 +110,6 @@ func (user *User) VerifyEmail() {
 
 func (user *User) ToResponse() types.UserResponse {
 	return types.UserResponse{
-		ID:          user.ID,
 		Username:    user.Username,
 		Email:       user.Email,
 		DisplayName: user.DisplayName,
@@ -123,9 +126,27 @@ func (user *User) ToResponse() types.UserResponse {
 	}
 }
 
+func (user *User) ToAdminResponse() types.AdminUserResponse {
+	return types.AdminUserResponse{
+		Username:        user.Username,
+		Email:           user.Email,
+		DisplayName:     user.DisplayName,
+		AvatarURL:       storage.ResolveCDN(user.AvatarURL),
+		Role:            string(user.Role),
+		EmailVerified:   user.EmailVerified,
+		AccountBanned:   user.AccountBanned,
+		BannedReason:    user.BannedReason,
+		BannedAt:        user.BannedAt,
+		AccountDisabled: user.AccountDisabled,
+		DisabledReason:  user.DisabledReason,
+		DisabledAt:      user.DisabledAt,
+		LastSeenAt:      user.LastSeenAt,
+		CreatedAt:       user.CreatedAt,
+	}
+}
+
 func (user *User) ToSummary() types.CitizenSummary {
 	return types.CitizenSummary{
-		ID:          user.ID,
 		Username:    user.Username,
 		DisplayName: user.DisplayName,
 		AvatarURL:   storage.ResolveCDN(user.AvatarURL),

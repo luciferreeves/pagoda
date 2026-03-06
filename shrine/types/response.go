@@ -11,7 +11,6 @@ type MessageResponse struct {
 }
 
 type UserResponse struct {
-	ID          uint       `json:"id"`
 	Username    string     `json:"username"`
 	Email       string     `json:"email"`
 	DisplayName string     `json:"display_name"`
@@ -33,7 +32,6 @@ type AuthResponse struct {
 }
 
 type CitizenSummary struct {
-	ID          uint   `json:"id"`
 	Username    string `json:"username"`
 	DisplayName string `json:"display_name"`
 	AvatarURL   string `json:"avatar_url"`
@@ -44,4 +42,29 @@ type StatsResponse struct {
 	Online         int64            `json:"online"`
 	NewestCitizens []CitizenSummary `json:"newest_citizens"`
 	OnlineCitizens []CitizenSummary `json:"online_citizens"`
+}
+
+type AdminUserResponse struct {
+	Username        string     `json:"username"`
+	Email           string     `json:"email"`
+	DisplayName     string     `json:"display_name"`
+	AvatarURL       string     `json:"avatar_url"`
+	Role            string     `json:"role"`
+	EmailVerified   bool       `json:"email_verified"`
+	AccountBanned   bool       `json:"account_banned"`
+	BannedReason    string     `json:"banned_reason"`
+	BannedAt        *time.Time `json:"banned_at"`
+	AccountDisabled bool       `json:"account_disabled"`
+	DisabledReason  string     `json:"disabled_reason"`
+	DisabledAt      *time.Time `json:"disabled_at"`
+	LastSeenAt      *time.Time `json:"last_seen_at"`
+	CreatedAt       time.Time  `json:"created_at"`
+}
+
+type PaginatedResponse struct {
+	Items      any   `json:"items"`
+	Total      int64 `json:"total"`
+	Page       int   `json:"page"`
+	PerPage    int   `json:"per_page"`
+	TotalPages int   `json:"total_pages"`
 }

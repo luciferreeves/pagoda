@@ -1,7 +1,6 @@
 import type { UserRole } from "./roles";
 
 export interface User {
-  id: number;
   username: string;
   email: string;
   display_name: string;

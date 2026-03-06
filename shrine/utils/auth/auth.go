@@ -73,6 +73,30 @@ func RequireAuthentication(handler fiber.Handler) fiber.Handler {
 	}
 }
 
+func RequireStaff(handler fiber.Handler) fiber.Handler {
+	return func(context *fiber.Ctx) error {
+		if !IsAuthenticated(context) {
+			return fiber.ErrUnauthorized
+		}
+		if !GetUser(context).IsStaff() {
+			return fiber.ErrForbidden
+		}
+		return handler(context)
+	}
+}
+
+func RequireAdmin(handler fiber.Handler) fiber.Handler {
+	return func(context *fiber.Ctx) error {
+		if !IsAuthenticated(context) {
+			return fiber.ErrUnauthorized
+		}
+		if !GetUser(context).IsAdmin() {
+			return fiber.ErrForbidden
+		}
+		return handler(context)
+	}
+}
+
 func GetUser(context *fiber.Ctx) *models.User {
 	user, _ := context.Locals(userKey).(*models.User)
 	return user

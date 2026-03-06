@@ -20,3 +20,15 @@ type VerifyRequest struct {
 type ResendActivationRequest struct {
 	Email string `json:"email"`
 }
+
+type BanUserRequest struct {
+	Reason string `json:"reason"`
+}
+
+type DisableUserRequest struct {
+	Reason string `json:"reason"`
+}
+
+type ChangeRoleRequest struct {
+	Role string `json:"role"`
+}

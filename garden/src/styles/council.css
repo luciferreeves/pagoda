@@ -1,0 +1,322 @@
+.council-search {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.council-search input {
+  flex: 1;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 6px 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.council-search input:focus {
+  border-color: var(--color-red);
+}
+
+.council-grid {
+  font-size: 12px;
+}
+
+.council-grid-header,
+.council-grid-row {
+  display: grid;
+  grid-template-columns: 3fr 3fr 1.5fr 1.5fr 1.5fr;
+  align-items: center;
+  gap: 0 12px;
+  padding: 8px 10px;
+}
+
+.council-grid-header {
+  background: var(--color-panel-header);
+  font-family: var(--font-display);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.council-grid-row {
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.council-grid-row:hover {
+  background: var(--color-overlay-light);
+}
+
+.council-grid-row > span {
+  min-width: 0;
+}
+
+.council-grid-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: 20px 8px;
+}
+
+.council-user-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.council-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.council-display-name {
+  display: block;
+  font-weight: 600;
+  color: var(--color-text-bright);
+}
+
+.council-username {
+  display: block;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.council-role {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.council-role-owner {
+  color: var(--color-purple);
+}
+
+.council-role-admin {
+  color: var(--color-red);
+}
+
+.council-role-moderator {
+  color: var(--color-yellow);
+}
+
+.council-role-member {
+  color: var(--color-text-muted);
+}
+
+.council-status {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 600;
+}
+
+.council-status-active {
+  color: var(--color-green);
+}
+
+.council-status-banned {
+  color: var(--color-red);
+}
+
+.council-status-disabled {
+  color: var(--color-yellow);
+}
+
+.council-status-unverified {
+  color: var(--color-text-muted);
+}
+
+.council-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.council-page-btn {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 4px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.council-page-btn:hover:not(:disabled) {
+  border-color: var(--color-text-muted);
+}
+
+.council-page-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.council-page-info {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.council-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.council-detail-header .page-title {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.council-detail-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 2px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.council-detail-handle {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.council-detail-section {
+  border: 1px solid var(--color-border);
+  margin-bottom: 10px;
+}
+
+.council-detail-section-header {
+  background: var(--color-panel-header);
+  background-image: linear-gradient(180deg, var(--color-overlay-lighter), transparent);
+  padding: 5px 10px;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: var(--color-red);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.council-detail-table {
+  font-size: 12px;
+}
+
+.council-detail-row {
+  display: flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.council-detail-row:last-child {
+  border-bottom: none;
+}
+
+.council-detail-label {
+  width: 100px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+}
+
+.council-detail-role-select {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text);
+  outline: none;
+  cursor: pointer;
+}
+
+.council-detail-actions {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.council-detail-action-row {
+  display: flex;
+  gap: 6px;
+}
+
+.council-detail-reason {
+  flex: 1;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 4px 8px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.council-detail-reason:focus {
+  border-color: var(--color-red);
+}
+
+.council-detail-action-btn {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 4px 12px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.council-detail-action-btn:hover {
+  border-color: var(--color-text-muted);
+}
+
+.council-action-ban:hover {
+  color: var(--color-red);
+  border-color: var(--color-red);
+}
+
+.council-action-unban:hover {
+  color: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.council-action-disable:hover {
+  color: var(--color-yellow);
+  border-color: var(--color-yellow);
+}
+
+.council-action-enable:hover {
+  color: var(--color-green);
+  border-color: var(--color-green);
+}
+
+.council-detail-back {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.council-detail-back:hover {
+  color: var(--color-text);
+}

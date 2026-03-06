@@ -1,5 +1,4 @@
 export interface CitizenSummary {
-  id: number;
   username: string;
   display_name: string;
   avatar_url: string;

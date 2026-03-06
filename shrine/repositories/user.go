@@ -4,6 +4,7 @@ import (
 	"shrine/database"
 	"shrine/enums"
 	"shrine/models"
+	"shrine/utils/meta"
 	"time"
 )
 
@@ -13,7 +14,7 @@ func CreateUser(user *models.User) error {
 
 	tx := database.DB
 	if count == 0 {
-		user.Role = enums.Admin
+		user.Role = enums.Owner
 		tx = tx.Set("bypass_username_validation", true)
 	}
 
@@ -68,4 +69,21 @@ func OnlineCitizens(limit int) []models.User {
 	var users []models.User
 	database.DB.Where("last_seen_at > ?", time.Now().Add(-5*time.Minute)).Order("last_seen_at desc").Limit(limit).Find(&users)
 	return users
+}
+
+func ListUsers(p meta.Pagination, search string) ([]models.User, int64) {
+	var users []models.User
+	var total int64
+
+	query := database.DB.Model(&models.User{})
+
+	if search != "" {
+		like := "%" + search + "%"
+		query = query.Where("username LIKE ? OR display_name LIKE ? OR email LIKE ?", like, like, like)
+	}
+
+	query.Count(&total)
+	p.Apply(query.Order("created_at desc")).Find(&users)
+
+	return users, total
 }
