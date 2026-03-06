@@ -53,6 +53,12 @@ func IsAuthenticated(context *fiber.Ctx) bool {
 		return false
 	}
 
+	now := time.Now()
+	if token.User.LastSeenAt == nil || time.Since(*token.User.LastSeenAt) > time.Minute {
+		token.User.LastSeenAt = &now
+		repositories.UpdateLastSeen(&token.User)
+	}
+
 	context.Locals(userKey, &token.User)
 	context.Locals(tokenHashKey, tokenHash)
 	return true

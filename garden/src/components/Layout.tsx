@@ -1,8 +1,9 @@
-import { type JSX, Show, onMount } from "solid-js";
+import { type JSX, Show, For, onMount, onCleanup, createEffect } from "solid-js";
 import { A } from "@solidjs/router";
 import Sidebar from "./Sidebar";
 import NavSection from "./NavSection";
 import { auth } from "../store/auth";
+import { stats } from "../store/stats";
 import { UserRole } from "../types/roles";
 
 interface LayoutProps {
@@ -10,7 +11,22 @@ interface LayoutProps {
 }
 
 export default function Layout(props: LayoutProps) {
-  onMount(() => auth.initialize());
+  let heartbeatInterval: ReturnType<typeof setInterval> | undefined;
+
+  onMount(() => {
+    auth.initialize();
+    stats.load();
+  });
+
+  createEffect(() => {
+    clearInterval(heartbeatInterval);
+    if (auth.user()) {
+      auth.heartbeat();
+      heartbeatInterval = setInterval(() => auth.heartbeat(), 2 * 60 * 1000);
+    }
+  });
+
+  onCleanup(() => clearInterval(heartbeatInterval));
 
   return (
     <>
@@ -23,12 +39,12 @@ export default function Layout(props: LayoutProps) {
         <A href="/" class="top-nav-link" data-accent="cyan" activeClass="active" end>Home</A>
         <A href="/districts" class="top-nav-link" data-accent="green" activeClass="active">Districts</A>
         <A href="/forums" class="top-nav-link" data-accent="pink" activeClass="active">Forums</A>
-        <A href="/chat" class="top-nav-link" data-accent="yellow" activeClass="active">Chat</A>
+        <A href="/tavern" class="top-nav-link" data-accent="yellow" activeClass="active">Tavern</A>
         <A href="/bazaar" class="top-nav-link" data-accent="purple" activeClass="active">Bazaar</A>
       </nav>
 
       <div class="search-bar">
-        <input type="text" placeholder="Search members, posts, districts..." />
+        <input type="text" placeholder="Search citizens, posts, districts..." />
       </div>
 
       <div class="site-main">
@@ -43,11 +59,9 @@ export default function Layout(props: LayoutProps) {
               }>
                 {((user) => (
                   <>
-                    <li><A href="/account">Account</A></li>
-                    <li><A href={`/u/${user.username}`}>My Page</A></li>
+                    <li><A href={`/u/${user.username}`}>My Domain</A></li>
                     <li><A href="/letters">Letters</A></li>
-                    <li><A href="/notifications">Notifications</A></li>
-                    <li><A href="/friends">Friends</A></li>
+                    <li><A href="/account">Account</A></li>
                     <li><A href="/account/settings">Settings</A></li>
                     <li><button type="button" class="sidebar-logout" onClick={() => auth.logout()}>Log Out</button></li>
                   </>
@@ -57,11 +71,15 @@ export default function Layout(props: LayoutProps) {
           </NavSection>
           <NavSection title="Community" accent="cyan">
             <ul>
-              <li><A href="/members">Members</A></li>
-              <li><A href="/online">Who's Online</A></li>
-              <li><A href="/random">Random Member</A></li>
+              <li><A href="/citizens">Citizens</A></li>
               <li><A href="/clubs">Clubs</A></li>
               <li><A href="/interests">Interests</A></li>
+            </ul>
+          </NavSection>
+          <NavSection title="Explore" accent="yellow">
+            <ul>
+              <li><A href="/online">Who's Online</A></li>
+              <li><A href="/random">Random Domain</A></li>
             </ul>
           </NavSection>
           <NavSection title="Services" accent="green">
@@ -96,18 +114,34 @@ export default function Layout(props: LayoutProps) {
         <Sidebar>
           <NavSection title="Statistics" accent="yellow">
             <ul>
-              <li>Members: —</li>
-              <li>Online: —</li>
+              <li>Citizens: {stats.data()?.citizens ?? "—"}</li>
+              <li>Online: {stats.data()?.online ?? "—"}</li>
               <li>Posts Today: —</li>
-              <li>Newest: —</li>
             </ul>
           </NavSection>
-          <NavSection title="New Members" accent="cyan">
+          <NavSection title="New Citizens" accent="cyan">
             <ul>
-              <li class="placeholder">Be the first to join!</li>
+              <Show when={stats.data()?.newest_citizens?.length} fallback={
+                <li class="placeholder">Be the first to join!</li>
+              }>
+                <For each={stats.data()?.newest_citizens}>
+                  {(citizen) => <li><A href={`/u/${citizen.username}`}>{citizen.display_name}</A></li>}
+                </For>
+              </Show>
             </ul>
           </NavSection>
-          <NavSection title="Birthdays" accent="green">
+          <NavSection title="Who's Online" accent="green">
+            <ul>
+              <Show when={stats.data()?.online_citizens?.length} fallback={
+                <li class="placeholder">No one online.</li>
+              }>
+                <For each={stats.data()?.online_citizens}>
+                  {(citizen) => <li><A href={`/u/${citizen.username}`}>{citizen.display_name}</A></li>}
+                </For>
+              </Show>
+            </ul>
+          </NavSection>
+          <NavSection title="Birthdays" accent="pink">
             <ul>
               <li class="placeholder">No birthdays today.</li>
             </ul>
@@ -133,7 +167,7 @@ export default function Layout(props: LayoutProps) {
           <A href="/terms">Terms</A>
           <A href="/contact">Contact</A>
         </nav>
-        <p>&copy; {new Date().getFullYear()} Pagoda. Brought to you by <a href="https://shi.foo" target="_blank" rel="noopener noreferrer">shi.foo</a>.</p>
+        <p>&copy; {new Date().getFullYear()} Pagoda. Brought to you by <a href="https://shi.foo" target="_blank" rel="noopener noreferrer">shi.foo</a>. Powered by <a href="https://nekoweb.org" target="_blank" rel="noopener noreferrer">Nekoweb</a>.</p>
       </footer>
     </>
   );

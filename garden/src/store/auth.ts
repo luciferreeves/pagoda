@@ -88,6 +88,13 @@ async function reactivate(email: string): Promise<string | null> {
   return (response.data as ErrorResponse).error;
 }
 
+async function heartbeat() {
+  const stored = token();
+  if (stored) {
+    await api("/auth/heartbeat", { method: "POST", token: stored });
+  }
+}
+
 async function logout() {
   const stored = token();
   if (stored) {
@@ -98,4 +105,4 @@ async function logout() {
   setUser(null);
 }
 
-export const auth = { user, token, loading, initialize, login, register, verify, reactivate, logout };
+export const auth = { user, token, loading, initialize, login, register, verify, reactivate, heartbeat, logout };

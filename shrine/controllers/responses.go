@@ -50,3 +50,7 @@ func Success(context *fiber.Ctx, data any) error {
 func Created(context *fiber.Ctx, data any) error {
 	return shortcuts.Response(context, data).As(fiber.StatusCreated)
 }
+
+func NoContent(context *fiber.Ctx) error {
+	return shortcuts.Response(context, nil).As(fiber.StatusNoContent)
+}

@@ -31,3 +31,17 @@ type AuthResponse struct {
 	Token string       `json:"token"`
 	User  UserResponse `json:"user"`
 }
+
+type CitizenSummary struct {
+	ID          uint   `json:"id"`
+	Username    string `json:"username"`
+	DisplayName string `json:"display_name"`
+	AvatarURL   string `json:"avatar_url"`
+}
+
+type StatsResponse struct {
+	Citizens       int64            `json:"citizens"`
+	Online         int64            `json:"online"`
+	NewestCitizens []CitizenSummary `json:"newest_citizens"`
+	OnlineCitizens []CitizenSummary `json:"online_citizens"`
+}

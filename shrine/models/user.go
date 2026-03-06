@@ -122,6 +122,15 @@ func (user *User) ToResponse() types.UserResponse {
 	}
 }
 
+func (user *User) ToSummary() types.CitizenSummary {
+	return types.CitizenSummary{
+		ID:          user.ID,
+		Username:    user.Username,
+		DisplayName: user.DisplayName,
+		AvatarURL:   user.AvatarURL,
+	}
+}
+
 func (user *User) BeforeCreate(tx *gorm.DB) error {
 	_, bypassUsername := tx.Get("bypass_username_validation")
 

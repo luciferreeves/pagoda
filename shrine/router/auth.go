@@ -16,4 +16,5 @@ func init() {
 	urls.Path(types.POST, "/reactivate", controllers.ResendActivationController, "reactivate")
 	urls.Path(types.POST, "/logout", auth.RequireAuthentication(controllers.LogoutController), "logout")
 	urls.Path(types.GET, "/me", auth.RequireAuthentication(controllers.MeController), "me")
+	urls.Path(types.POST, "/heartbeat", auth.RequireAuthentication(controllers.HeartbeatController), "heartbeat")
 }

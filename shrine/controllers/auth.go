@@ -181,3 +181,7 @@ func MeController(context *fiber.Ctx) error {
 	user := auth.GetUser(context)
 	return Success(context, user.ToResponse())
 }
+
+func HeartbeatController(context *fiber.Ctx) error {
+	return NoContent(context)
+}

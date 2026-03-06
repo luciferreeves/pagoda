@@ -12,5 +12,8 @@ func Response(ctx *fiber.Ctx, data any) *response {
 
 func (r *response) As(status int) error {
 	r.status = status
+	if r.data == nil {
+		return r.ctx.SendStatus(status)
+	}
 	return r.ctx.Status(status).JSON(r.data)
 }
