@@ -19,5 +19,6 @@ WORKDIR /shrine
 RUN apt-get update && apt-get install -y ca-certificates tzdata && rm -rf /var/lib/apt/lists/*
 
 COPY --from=builder /shrine/bin/shrine .
+COPY --from=builder /shrine/templates ./templates
 
 CMD ["./shrine"]
