@@ -6,12 +6,21 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+func findParam(params []hypertext.Param, key string) (string, bool) {
+	for _, param := range params {
+		if param.Key == key {
+			return param.Value, true
+		}
+	}
+	return "", false
+}
+
 func buildQueryParams(context *fiber.Ctx) []hypertext.Param {
 	params := make([]hypertext.Param, 0)
-	context.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
+	context.Request().URI().QueryArgs().VisitAll(func(name, value []byte) {
 		params = append(params, hypertext.Param{
-			Key:   string(k),
-			Value: string(v),
+			Key:   string(name),
+			Value: string(value),
 		})
 	})
 	return params
@@ -19,10 +28,10 @@ func buildQueryParams(context *fiber.Ctx) []hypertext.Param {
 
 func buildRouteParams(context *fiber.Ctx) []hypertext.Param {
 	params := make([]hypertext.Param, 0)
-	for k, v := range context.AllParams() {
+	for name, value := range context.AllParams() {
 		params = append(params, hypertext.Param{
-			Key:   k,
-			Value: v,
+			Key:   name,
+			Value: value,
 		})
 	}
 	return params
@@ -30,10 +39,10 @@ func buildRouteParams(context *fiber.Ctx) []hypertext.Param {
 
 func buildHeaders(context *fiber.Ctx) []hypertext.Param {
 	params := make([]hypertext.Param, 0)
-	context.Request().Header.VisitAll(func(k, v []byte) {
+	context.Request().Header.VisitAll(func(name, value []byte) {
 		params = append(params, hypertext.Param{
-			Key:   string(k),
-			Value: string(v),
+			Key:   string(name),
+			Value: string(value),
 		})
 	})
 	return params

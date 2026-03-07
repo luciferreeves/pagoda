@@ -31,21 +31,21 @@ func Paginate(context *fiber.Ctx) Pagination {
 	return Pagination{Page: page, PerPage: perPage}
 }
 
-func (p Pagination) Apply(query *gorm.DB) *gorm.DB {
-	return query.Offset((p.Page - 1) * p.PerPage).Limit(p.PerPage)
+func (self Pagination) Apply(query *gorm.DB) *gorm.DB {
+	return query.Offset((self.Page - 1) * self.PerPage).Limit(self.PerPage)
 }
 
-func (p Pagination) Response(items any, total int64) common.PaginatedResponse {
-	totalPages := int(total) / p.PerPage
-	if int(total)%p.PerPage > 0 {
+func (self Pagination) Response(items any, total int64) common.PaginatedResponse {
+	totalPages := int(total) / self.PerPage
+	if int(total)%self.PerPage > 0 {
 		totalPages++
 	}
 
 	return common.PaginatedResponse{
 		Items:      items,
 		Total:      total,
-		Page:       p.Page,
-		PerPage:    p.PerPage,
+		Page:       self.Page,
+		PerPage:    self.PerPage,
 		TotalPages: totalPages,
 	}
 }

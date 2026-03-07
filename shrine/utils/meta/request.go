@@ -18,9 +18,9 @@ func Request(context *fiber.Ctx) facade {
 	return facade{Request: request, context: context}
 }
 
-func (f facade) Param(key string) (string, bool) {
-	if f.context != nil {
-		val := f.context.Params(key)
+func (self facade) Param(key string) (string, bool) {
+	if self.context != nil {
+		val := self.context.Params(key)
 		if val != "" {
 			return val, true
 		}
@@ -28,28 +28,17 @@ func (f facade) Param(key string) (string, bool) {
 	return "", false
 }
 
-func (f facade) Query(key string) (string, bool) {
-	for _, q := range f.Request.Query {
-		if q.Key == key {
-			return q.Value, true
-		}
-	}
-	return "", false
+func (self facade) Query(key string) (string, bool) {
+	return findParam(self.Request.Query, key)
 }
 
-func (f facade) Header(key string) (string, bool) {
-	for _, h := range f.Request.Headers {
-		if h.Key == key {
-			return h.Value, true
-		}
-	}
-	return "", false
+func (self facade) Header(key string) (string, bool) {
+	return findParam(self.Request.Headers, key)
 }
 
-func (r required) Param(key string) string {
-	// Access params directly from fiber context (available after route matching)
-	if r.context != nil {
-		val := r.context.Params(key)
+func (self required) Param(key string) string {
+	if self.context != nil {
+		val := self.context.Params(key)
 		if val != "" {
 			return val
 		}
@@ -58,50 +47,44 @@ func (r required) Param(key string) string {
 	return ""
 }
 
-func (r required) Query(key string) string {
-	for _, q := range r.request.Query {
-		if q.Key == key {
-			return q.Value
-		}
+func (self required) Query(key string) string {
+	value, found := findParam(self.request.Query, key)
+	if !found {
+		logger.Errorf("META", "missing required query: %s", key)
 	}
-	logger.Errorf("META", "missing required query: %s", key)
-	return ""
+	return value
 }
 
-func (r required) Header(key string) string {
-	for _, h := range r.request.Headers {
-		if h.Key == key {
-			return h.Value
-		}
+func (self required) Header(key string) string {
+	value, found := findParam(self.request.Headers, key)
+	if !found {
+		logger.Errorf("META", "missing required header: %s", key)
 	}
-	logger.Errorf("META", "missing required header: %s", key)
-	return ""
+	return value
 }
 
-func (d withDefault) Param(key string) string {
-	if d.context != nil {
-		val := d.context.Params(key)
+func (self withDefault) Param(key string) string {
+	if self.context != nil {
+		val := self.context.Params(key)
 		if val != "" {
 			return val
 		}
 	}
-	return d.defaults
+	return self.defaults
 }
 
-func (d withDefault) Query(key string) string {
-	for _, q := range d.request.Query {
-		if q.Key == key {
-			return q.Value
-		}
+func (self withDefault) Query(key string) string {
+	value, found := findParam(self.request.Query, key)
+	if found {
+		return value
 	}
-	return d.defaults
+	return self.defaults
 }
 
-func (d withDefault) Header(key string) string {
-	for _, h := range d.request.Headers {
-		if h.Key == key {
-			return h.Value
-		}
+func (self withDefault) Header(key string) string {
+	value, found := findParam(self.request.Headers, key)
+	if found {
+		return value
 	}
-	return d.defaults
+	return self.defaults
 }
