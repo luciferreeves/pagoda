@@ -1,0 +1,26 @@
+package messages
+
+const (
+	UserNotFound           = "User not found."
+	CannotBanSelf          = "You cannot ban yourself."
+	CannotBanOwner         = "You cannot ban the owner."
+	CannotBanAdmin         = "Only the owner can ban an administrator."
+	CannotDisableSelf      = "You cannot disable yourself."
+	CannotDisableOwner     = "You cannot disable the owner."
+	CannotDisableAdmin     = "Only the owner can disable an administrator."
+	CannotChangeOwnRole    = "You cannot change your own role."
+	CannotChangeOwnerRole  = "You cannot change the owner's role."
+	OnlyOwnerAssignAdmin   = "Only the owner can assign the admin role."
+	InvalidRole            = "Invalid role."
+	InvalidDisabledUntil   = "Invalid disabled_until format. Use RFC3339."
+	NoChangesProvided      = "No changes provided."
+	OnlyOwnerChangeEmail   = "Only the owner can change email addresses."
+	InvalidUsername        = "Username must be 3-32 characters and can only contain letters, numbers, and underscores."
+	UsernameNotAvailable   = "This username is not available."
+	FailedBanUser          = "Failed to ban user."
+	FailedUnbanUser        = "Failed to unban user."
+	FailedDisableUser      = "Failed to disable user."
+	FailedEnableUser       = "Failed to enable user."
+	FailedChangeRole       = "Failed to change role."
+	FailedUpdateUser       = "Failed to update user."
+)

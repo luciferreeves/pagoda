@@ -1,0 +1,8 @@
+{% extends "layouts/email.html" %}
+{% block content %}
+<h2 style="margin: 0 0 16px 0; font-size: 20px; color: #e8e8f0;">Your account has been banned</h2>
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">Hello {{ username }}, your Pagoda account has been permanently banned.</p>
+<p style="margin: 0 0 8px 0; font-size: 13px; color: #707088;">Reason:</p>
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">{{ reason }}</p>
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">This action is permanent. If you believe this was a mistake, please contact us via email.</p>
+{% endblock %}

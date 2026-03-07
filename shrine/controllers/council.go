@@ -1,189 +1,134 @@
 package controllers
 
 import (
-	"errors"
-	"shrine/enums"
-	"shrine/models"
-	"shrine/repositories"
-	"shrine/types"
+	"shrine/services"
+	"shrine/types/council"
 	"shrine/utils/auth"
 	"shrine/utils/meta"
-	"time"
+	"shrine/utils/shortcuts"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func findTargetUser(context *fiber.Ctx) (*models.User, error) {
-	username := meta.Request(context).MustHave().Param("username")
-	return repositories.FindUserByUsername(username)
-}
-
 func ListUsersController(context *fiber.Ctx) error {
-	p := meta.Paginate(context)
+	pagination := meta.Paginate(context)
 	search, _ := meta.Request(context).Query("search")
 
-	users, total := repositories.ListUsers(p, search)
-
-	items := make([]types.AdminUserResponse, len(users))
-	for i, u := range users {
-		items[i] = u.ToAdminResponse()
-	}
-
-	return Success(context, p.Response(items, total))
+	items, total := services.ListUsers(pagination, search)
+	return shortcuts.Success(context, pagination.Response(items, total))
 }
 
 func GetUserController(context *fiber.Ctx) error {
-	user, err := findTargetUser(context)
-	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+	username := meta.Request(context).MustHave().Param("username")
+
+	result, serviceErr := services.GetUser(username)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }
 
 func BanUserController(context *fiber.Ctx) error {
 	admin := auth.GetUser(context)
-
-	user, err := findTargetUser(context)
-	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.ID == admin.ID {
-		return BadRequest(context, errors.New("You cannot ban yourself."))
+	body, _ := meta.Body[council.BanRequest](context)
+
+	result, serviceErr := services.BanUser(admin, target, body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.IsOwner() {
-		return BadRequest(context, errors.New("You cannot ban the owner."))
-	}
-
-	if user.IsAdmin() && !admin.IsOwner() {
-		return BadRequest(context, errors.New("Only the owner can ban an administrator."))
-	}
-
-	body, _ := meta.Body[types.BanUserRequest](context)
-
-	now := time.Now()
-	user.AccountBanned = true
-	user.BannedAt = &now
-	user.BannedReason = body.Reason
-	user.BannedBy = &admin.ID
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to ban user."))
-	}
-
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }
 
 func UnbanUserController(context *fiber.Ctx) error {
-	user, err := findTargetUser(context)
-	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+	admin := auth.GetUser(context)
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	user.AccountBanned = false
-	user.BannedAt = nil
-	user.BannedReason = ""
-	user.BannedBy = nil
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to unban user."))
+	result, serviceErr := services.UnbanUser(admin, target)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }
 
 func DisableUserController(context *fiber.Ctx) error {
 	admin := auth.GetUser(context)
-
-	user, err := findTargetUser(context)
-	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.ID == admin.ID {
-		return BadRequest(context, errors.New("You cannot disable yourself."))
+	body, _ := meta.Body[council.DisableRequest](context)
+
+	result, serviceErr := services.DisableUser(admin, target, body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.IsOwner() {
-		return BadRequest(context, errors.New("You cannot disable the owner."))
-	}
-
-	if user.IsAdmin() && !admin.IsOwner() {
-		return BadRequest(context, errors.New("Only the owner can disable an administrator."))
-	}
-
-	body, _ := meta.Body[types.DisableUserRequest](context)
-
-	now := time.Now()
-	user.AccountDisabled = true
-	user.DisabledAt = &now
-	user.DisabledReason = body.Reason
-	user.DisabledBy = &admin.ID
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to disable user."))
-	}
-
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }
 
 func EnableUserController(context *fiber.Ctx) error {
-	user, err := findTargetUser(context)
-	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+	admin := auth.GetUser(context)
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	user.AccountDisabled = false
-	user.DisabledAt = nil
-	user.DisabledReason = ""
-	user.DisabledBy = nil
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to enable user."))
+	result, serviceErr := services.EnableUser(admin, target)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }
 
 func ChangeRoleController(context *fiber.Ctx) error {
 	admin := auth.GetUser(context)
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
+	}
 
-	user, err := findTargetUser(context)
+	body, err := meta.Body[council.ChangeRoleRequest](context)
 	if err != nil {
-		return NotFound(context, errors.New("User not found."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	if user.ID == admin.ID {
-		return BadRequest(context, errors.New("You cannot change your own role."))
+	result, serviceErr := services.ChangeRole(admin, target, body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.IsOwner() {
-		return BadRequest(context, errors.New("You cannot change the owner's role."))
+	return shortcuts.Success(context, result)
+}
+
+func EditUserController(context *fiber.Ctx) error {
+	admin := auth.GetUser(context)
+	target, serviceErr := services.ResolveUser(meta.Request(context).MustHave().Param("username"))
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	body, err := meta.Body[types.ChangeRoleRequest](context)
+	body, err := meta.Body[council.EditUserRequest](context)
 	if err != nil {
-		return BadRequest(context, errors.New("Invalid request body."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	role := enums.UserRole(body.Role)
-	switch role {
-	case enums.Member, enums.Moderator:
-		user.Role = role
-	case enums.Admin:
-		if !admin.IsOwner() {
-			return BadRequest(context, errors.New("Only the owner can assign the admin role."))
-		}
-		user.Role = role
-	default:
-		return BadRequest(context, errors.New("Invalid role."))
+	result, serviceErr := services.EditUser(admin, target, body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to change role."))
-	}
-
-	return Success(context, user.ToAdminResponse())
+	return shortcuts.Success(context, result)
 }

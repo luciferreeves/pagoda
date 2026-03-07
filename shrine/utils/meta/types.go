@@ -1,23 +1,23 @@
 package meta
 
 import (
-	"shrine/types"
+	"shrine/types/hypertext"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type facade struct {
-	types.Request
+	hypertext.Request
 	context *fiber.Ctx
 }
 
 type required struct {
-	request types.Request
+	request hypertext.Request
 	context *fiber.Ctx
 }
 
 type withDefault struct {
-	request  types.Request
+	request  hypertext.Request
 	context  *fiber.Ctx
 	defaults string
 }

@@ -1,7 +1,7 @@
 package router
 
 import (
-	"shrine/controllers"
+	"shrine/utils/shortcuts"
 	"shrine/utils/urls"
 
 	"github.com/gofiber/fiber/v2"
@@ -11,24 +11,22 @@ func Initialize(router *fiber.App) {
 	urls.Attach(router)
 }
 
-func ErrorHandler(ctx *fiber.Ctx, err error) error {
+func ErrorHandler(context *fiber.Ctx, err error) error {
 	code := fiber.StatusInternalServerError
-	if e, ok := err.(*fiber.Error); ok {
-		code = e.Code
+	if fiberErr, ok := err.(*fiber.Error); ok {
+		code = fiberErr.Code
 	}
 
 	switch code {
 	case fiber.StatusBadRequest:
-		return controllers.BadRequest(ctx, err)
+		return shortcuts.BadRequest(context, err)
 	case fiber.StatusUnauthorized:
-		return controllers.Unauthorized(ctx, err)
+		return shortcuts.Unauthorized(context, err)
 	case fiber.StatusForbidden:
-		return controllers.Forbidden(ctx, err)
+		return shortcuts.Forbidden(context, err)
 	case fiber.StatusNotFound:
-		return controllers.NotFound(ctx, err)
-	case fiber.StatusInternalServerError:
-		return controllers.InternalServerError(ctx, err)
+		return shortcuts.NotFound(context, err)
 	default:
-		return controllers.DefaultError(ctx, err)
+		return shortcuts.InternalServerError(context, err)
 	}
 }

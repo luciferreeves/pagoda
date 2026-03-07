@@ -14,15 +14,3 @@ func (set Set[T]) Has(value T) bool {
 	_, exists := set[value]
 	return exists
 }
-
-func (set Set[T]) Add(value T) {
-	set[value] = struct{}{}
-}
-
-func (set Set[T]) Remove(value T) {
-	delete(set, value)
-}
-
-func (set Set[T]) Len() int {
-	return len(set)
-}

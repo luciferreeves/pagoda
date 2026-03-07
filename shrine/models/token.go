@@ -16,10 +16,6 @@ type Token struct {
 	UserAgent string `gorm:"size:512"`
 }
 
-func (token *Token) IsExpired() bool {
-	return time.Now().After(token.ExpiresAt)
-}
-
 func (token *Token) BeforeCreate(tx *gorm.DB) error {
 	if token.TokenHash == "" {
 		return gorm.ErrInvalidData

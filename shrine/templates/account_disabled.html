@@ -1,0 +1,11 @@
+{% extends "layouts/email.html" %}
+{% block content %}
+<h2 style="margin: 0 0 16px 0; font-size: 20px; color: #e8e8f0;">Your account has been disabled</h2>
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">Hello {{ username }}, your Pagoda account has been temporarily disabled.</p>
+<p style="margin: 0 0 8px 0; font-size: 13px; color: #707088;">Reason:</p>
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">{{ reason }}</p>
+{% if disabled_until %}
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">Your account will be re-enabled on {{ disabled_until }}.</p>
+{% endif %}
+<p style="margin: 0 0 16px 0; line-height: 1.6; color: #c8c8d8;">A system notice has been sent to your inbox with more details. If you believe this was a mistake, you can open a support ticket after logging in.</p>
+{% endblock %}

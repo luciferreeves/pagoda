@@ -1,4 +1,4 @@
-package types
+package account
 
 type RegisterRequest struct {
 	Username    string `json:"username"`
@@ -19,16 +19,4 @@ type VerifyRequest struct {
 
 type ResendActivationRequest struct {
 	Email string `json:"email"`
-}
-
-type BanUserRequest struct {
-	Reason string `json:"reason"`
-}
-
-type DisableUserRequest struct {
-	Reason string `json:"reason"`
-}
-
-type ChangeRoleRequest struct {
-	Role string `json:"role"`
 }

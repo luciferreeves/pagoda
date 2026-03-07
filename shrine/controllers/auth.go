@@ -1,187 +1,95 @@
 package controllers
 
 import (
-	"errors"
-	"shrine/enums"
-	"strings"
-	"shrine/models"
-	"shrine/repositories"
-	"shrine/types"
+	"shrine/services"
+	"shrine/types/account"
 	"shrine/utils/auth"
-	"shrine/utils/emails"
-	"shrine/utils/logger"
 	"shrine/utils/meta"
-	"time"
+	"shrine/utils/shortcuts"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 func RegisterController(context *fiber.Ctx) error {
-	body, err := meta.Body[types.RegisterRequest](context)
+	body, err := meta.Body[account.RegisterRequest](context)
 	if err != nil {
-		return BadRequest(context, errors.New("Invalid request body."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	user := models.User{
-		Username:    body.Username,
-		Email:       body.Email,
-		DisplayName: body.DisplayName,
+	result, serviceErr := services.Register(body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if err := user.SetPassword(body.Password); err != nil {
-		return BadRequest(context, err)
-	}
-
-	if err := repositories.CreateUser(&user); err != nil {
-		if strings.Contains(err.Error(), "users.username") {
-			return BadRequest(context, errors.New("An account with that username already exists."))
-		}
-		if strings.Contains(err.Error(), "users.email") {
-			return BadRequest(context, errors.New("An account with that email address already exists."))
-		}
-		return BadRequest(context, err)
-	}
-
-	token, err := auth.GenerateToken()
-	if err != nil {
-		return InternalServerError(context, errors.New("Failed to generate verification token."))
-	}
-
-	user.SetVerification(auth.HashToken(token), time.Now().Add(24*time.Hour), enums.Activation)
-
-	if err := repositories.UpdateUser(&user); err != nil {
-		return InternalServerError(context, errors.New("Failed to store verification token."))
-	}
-
-	if err := emails.SendActivation(user.Email, user.Username, token); err != nil {
-		logger.Errorf("Auth", "Failed to send verification email to %s: %v", user.Email, err)
-	}
-
-	return Created(context, types.MessageResponse{
-		Message: "Your account has been created. Please check your email to verify your account.",
-	})
+	return shortcuts.Created(context, result)
 }
 
 func LoginController(context *fiber.Ctx) error {
-	body, err := meta.Body[types.LoginRequest](context)
+	body, err := meta.Body[account.LoginRequest](context)
 	if err != nil {
-		return BadRequest(context, errors.New("Invalid request body."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	user, err := repositories.FindUserByUsername(body.Username)
+	citizen, serviceErr := services.Authenticate(body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
+	}
+
+	token, err := auth.IssueToken(context, citizen.ID)
 	if err != nil {
-		return Unauthorized(context, errors.New("Invalid username or password."))
+		return shortcuts.InternalServerError(context, err)
 	}
 
-	if !user.CanAuthenticate() {
-		return Forbidden(context, errors.New("Your account has been banned or disabled."))
-	}
-
-	if !user.CheckPassword(body.Password) {
-		return Unauthorized(context, errors.New("Invalid username or password."))
-	}
-
-	if !user.IsVerified() {
-		return Forbidden(context, errors.New("Your email address has not been verified. Please check your inbox."))
-	}
-
-	token, err := auth.IssueToken(context, user.ID)
-	if err != nil {
-		return InternalServerError(context, errors.New("Failed to create session."))
-	}
-
-	return Success(context, types.AuthResponse{
+	return shortcuts.Success(context, account.AuthResponse{
 		Token: token,
-		User:  user.ToResponse(),
+		User:  citizen.ToResponse(),
 	})
 }
 
 func VerifyController(context *fiber.Ctx) error {
-	body, err := meta.Body[types.VerifyRequest](context)
+	body, err := meta.Body[account.VerifyRequest](context)
 	if err != nil {
-		return BadRequest(context, errors.New("Invalid request body."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	if body.Token == "" {
-		return BadRequest(context, errors.New("Verification token is required."))
+	result, serviceErr := services.VerifyAccount(body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	verificationType := enums.VerificationType(body.Type)
-
-	tokenHash := auth.HashToken(body.Token)
-
-	user, err := repositories.FindUserByVerification(tokenHash, verificationType)
-	if err != nil {
-		return BadRequest(context, errors.New("Your verification link is invalid or has expired."))
-	}
-
-	switch verificationType {
-	case enums.Activation:
-		user.VerifyEmail()
-	default:
-		return BadRequest(context, errors.New("Invalid verification type."))
-	}
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to verify your account."))
-	}
-
-	return Success(context, types.MessageResponse{
-		Message: "Your email has been verified successfully. You can now log in.",
-	})
+	return shortcuts.Success(context, result)
 }
 
 func ResendActivationController(context *fiber.Ctx) error {
-	body, err := meta.Body[types.ResendActivationRequest](context)
+	body, err := meta.Body[account.ResendActivationRequest](context)
 	if err != nil {
-		return BadRequest(context, errors.New("Invalid request body."))
+		return shortcuts.BadRequest(context, err)
 	}
 
-	user, err := repositories.FindUserByEmail(body.Email)
-	if err != nil {
-		return BadRequest(context, errors.New("No account exists with that email address."))
+	result, serviceErr := services.ResendActivation(body)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	if user.IsVerified() {
-		return BadRequest(context, errors.New("This account has already been verified."))
-	}
-
-	token, err := auth.GenerateToken()
-	if err != nil {
-		return InternalServerError(context, errors.New("Failed to generate verification token."))
-	}
-
-	user.SetVerification(auth.HashToken(token), time.Now().Add(24*time.Hour), enums.Activation)
-
-	if err := repositories.UpdateUser(user); err != nil {
-		return InternalServerError(context, errors.New("Failed to store verification token."))
-	}
-
-	if err := emails.SendActivation(user.Email, user.Username, token); err != nil {
-		logger.Errorf("Auth", "Failed to send verification email to %s: %v", user.Email, err)
-	}
-
-	return Success(context, types.MessageResponse{
-		Message: "A new verification email has been sent. Please check your inbox.",
-	})
+	return shortcuts.Success(context, result)
 }
 
 func LogoutController(context *fiber.Ctx) error {
 	tokenHash := auth.GetTokenHash(context)
-	if err := repositories.DeleteToken(tokenHash); err != nil {
-		return InternalServerError(context, errors.New("Failed to end your session."))
+
+	result, serviceErr := services.RevokeToken(tokenHash)
+	if serviceErr != nil {
+		return shortcuts.HandleError(context, serviceErr)
 	}
 
-	return Success(context, types.MessageResponse{
-		Message: "You have been logged out successfully.",
-	})
+	return shortcuts.Success(context, result)
 }
 
 func MeController(context *fiber.Ctx) error {
-	user := auth.GetUser(context)
-	return Success(context, user.ToResponse())
+	citizen := auth.GetUser(context)
+	return shortcuts.Success(context, citizen.ToResponse())
 }
 
 func HeartbeatController(context *fiber.Ctx) error {
-	return NoContent(context)
+	return shortcuts.NoContent(context)
 }

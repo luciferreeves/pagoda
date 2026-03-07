@@ -1,13 +1,13 @@
 package meta
 
 import (
-	"shrine/types"
+	"shrine/types/hypertext"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func BuildRequest(context *fiber.Ctx) types.Request {
-	return types.Request{
+func BuildRequest(context *fiber.Ctx) hypertext.Request {
+	return hypertext.Request{
 		Path:        context.Path(),
 		Method:      context.Method(),
 		Query:       buildQueryParams(context),

@@ -1,7 +1,7 @@
 package meta
 
 import (
-	"shrine/types"
+	"shrine/types/hypertext"
 	"shrine/utils/logger"
 
 	"github.com/gofiber/fiber/v2"
@@ -10,7 +10,7 @@ import (
 const RequestKey = "__request_context"
 
 func Request(context *fiber.Ctx) facade {
-	request, ok := context.Locals(RequestKey).(types.Request)
+	request, ok := context.Locals(RequestKey).(hypertext.Request)
 	if !ok {
 		logger.Errorf("META", "RequestContext missing in fiber locals")
 		return facade{}

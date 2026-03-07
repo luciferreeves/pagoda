@@ -1,13 +1,10 @@
 package auth
 
 import (
-	"crypto/hmac"
-	"crypto/rand"
-	"crypto/sha256"
-	"encoding/hex"
 	"shrine/config"
 	"shrine/models"
 	"shrine/repositories"
+	"shrine/utils/crypto"
 	"shrine/utils/meta"
 	"strings"
 	"time"
@@ -20,21 +17,6 @@ const (
 	tokenHashKey = "__auth_token_hash"
 )
 
-func GenerateToken() (string, error) {
-	bytes := make([]byte, 32)
-	_, err := rand.Read(bytes)
-	if err != nil {
-		return "", err
-	}
-	return hex.EncodeToString(bytes), nil
-}
-
-func HashToken(rawToken string) string {
-	mac := hmac.New(sha256.New, []byte(config.Server.Secret))
-	mac.Write([]byte(rawToken))
-	return hex.EncodeToString(mac.Sum(nil))
-}
-
 func IsAuthenticated(context *fiber.Ctx) bool {
 	header, ok := meta.Request(context).Header("Authorization")
 	if !ok || !strings.HasPrefix(header, "Bearer ") {
@@ -42,7 +24,7 @@ func IsAuthenticated(context *fiber.Ctx) bool {
 	}
 
 	rawToken := strings.TrimPrefix(header, "Bearer ")
-	tokenHash := HashToken(rawToken)
+	tokenHash := crypto.HashToken(rawToken)
 
 	token, err := repositories.FindValidToken(tokenHash)
 	if err != nil {
@@ -108,7 +90,7 @@ func GetTokenHash(context *fiber.Ctx) string {
 }
 
 func IssueToken(context *fiber.Ctx, userID uint) (string, error) {
-	token, err := GenerateToken()
+	token, err := crypto.GenerateToken()
 	if err != nil {
 		return "", err
 	}
@@ -117,7 +99,7 @@ func IssueToken(context *fiber.Ctx, userID uint) (string, error) {
 	userAgent, _ := request.Header("User-Agent")
 
 	record := models.Token{
-		TokenHash: HashToken(token),
+		TokenHash: crypto.HashToken(token),
 		UserID:    userID,
 		ExpiresAt: time.Now().Add(config.Server.TokenExpiry),
 		IPAddress: request.IP,

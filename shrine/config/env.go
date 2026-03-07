@@ -26,10 +26,12 @@ type smtp struct {
 }
 
 type storage struct {
-	Endpoint  string `env:"MINIO_ENDPOINT" default:"localhost:9000"`
-	AccessKey string `env:"MINIO_ACCESS_KEY" default:""`
-	SecretKey string `env:"MINIO_SECRET_KEY" default:""`
-	Bucket    string `env:"MINIO_BUCKET" default:"pagoda"`
-	UseSSL    bool   `env:"MINIO_USE_SSL" default:"false"`
-	CDN       string `env:"CDN_URL" default:""`
+	Endpoint       string `env:"MINIO_ENDPOINT" default:"localhost:9000"`
+	AccessKey      string `env:"MINIO_ACCESS_KEY" default:""`
+	SecretKey      string `env:"MINIO_SECRET_KEY" default:""`
+	Bucket         string `env:"MINIO_BUCKET" default:"pagoda"`
+	UseSSL         bool   `env:"MINIO_USE_SSL" default:"false"`
+	CDN            string `env:"CDN_URL" default:""`
+	MaxFileSize    int64  `env:"MAX_FILE_SIZE" default:"33554432"`
+	MaxAttachments int    `env:"MAX_ATTACHMENTS" default:"8"`
 }

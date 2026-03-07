@@ -2,7 +2,7 @@ package router
 
 import (
 	"shrine/controllers"
-	"shrine/types"
+	"shrine/enums"
 	"shrine/utils/auth"
 	"shrine/utils/urls"
 )
@@ -10,11 +10,11 @@ import (
 func init() {
 	urls.SetNamespace("auth")
 
-	urls.Path(types.POST, "/register", controllers.RegisterController, "register")
-	urls.Path(types.POST, "/login", controllers.LoginController, "login")
-	urls.Path(types.POST, "/verify", controllers.VerifyController, "verify")
-	urls.Path(types.POST, "/reactivate", controllers.ResendActivationController, "reactivate")
-	urls.Path(types.POST, "/logout", auth.RequireAuthentication(controllers.LogoutController), "logout")
-	urls.Path(types.GET, "/me", auth.RequireAuthentication(controllers.MeController), "me")
-	urls.Path(types.POST, "/heartbeat", auth.RequireAuthentication(controllers.HeartbeatController), "heartbeat")
+	urls.Path(enums.POST, "/register", controllers.RegisterController, "register")
+	urls.Path(enums.POST, "/login", controllers.LoginController, "login")
+	urls.Path(enums.POST, "/verify", controllers.VerifyController, "verify")
+	urls.Path(enums.POST, "/reactivate", controllers.ResendActivationController, "reactivate")
+	urls.Path(enums.POST, "/logout", auth.RequireAuthentication(controllers.LogoutController), "logout")
+	urls.Path(enums.GET, "/me", auth.RequireAuthentication(controllers.MeController), "me")
+	urls.Path(enums.POST, "/heartbeat", auth.RequireAuthentication(controllers.HeartbeatController), "heartbeat")
 }

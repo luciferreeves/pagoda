@@ -1,13 +1,13 @@
 package urls
 
 import (
-	"shrine/types"
+	"shrine/enums"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func Path(method types.HTTPMethod, path string, handler fiber.Handler, name string) {
+func Path(method enums.HTTPMethod, path string, handler fiber.Handler, name string) {
 	registry.mutex.Lock()
 	defer registry.mutex.Unlock()
 
@@ -38,14 +38,3 @@ func Path(method types.HTTPMethod, path string, handler fiber.Handler, name stri
 	}
 }
 
-func GetFullPath(routeName string) (string, bool) {
-	registry.mutex.Lock()
-	defer registry.mutex.Unlock()
-
-	route, ok := registry.routes[routeName]
-	if !ok {
-		return "", false
-	}
-
-	return route.fullPath, true
-}

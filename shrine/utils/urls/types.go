@@ -1,14 +1,14 @@
 package urls
 
 import (
-	"shrine/types"
+	"shrine/enums"
 	"sync"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type registeredRoute struct {
-	method    types.HTTPMethod
+	method    enums.HTTPMethod
 	path      string
 	handler   fiber.Handler
 	namespace string

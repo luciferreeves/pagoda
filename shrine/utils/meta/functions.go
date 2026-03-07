@@ -1,15 +1,15 @@
 package meta
 
 import (
-	"shrine/types"
+	"shrine/types/hypertext"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-func buildQueryParams(context *fiber.Ctx) []types.HTTPParam {
-	params := make([]types.HTTPParam, 0)
+func buildQueryParams(context *fiber.Ctx) []hypertext.Param {
+	params := make([]hypertext.Param, 0)
 	context.Request().URI().QueryArgs().VisitAll(func(k, v []byte) {
-		params = append(params, types.HTTPParam{
+		params = append(params, hypertext.Param{
 			Key:   string(k),
 			Value: string(v),
 		})
@@ -17,10 +17,10 @@ func buildQueryParams(context *fiber.Ctx) []types.HTTPParam {
 	return params
 }
 
-func buildRouteParams(context *fiber.Ctx) []types.HTTPParam {
-	params := make([]types.HTTPParam, 0)
+func buildRouteParams(context *fiber.Ctx) []hypertext.Param {
+	params := make([]hypertext.Param, 0)
 	for k, v := range context.AllParams() {
-		params = append(params, types.HTTPParam{
+		params = append(params, hypertext.Param{
 			Key:   k,
 			Value: v,
 		})
@@ -28,10 +28,10 @@ func buildRouteParams(context *fiber.Ctx) []types.HTTPParam {
 	return params
 }
 
-func buildHeaders(context *fiber.Ctx) []types.HTTPParam {
-	params := make([]types.HTTPParam, 0)
+func buildHeaders(context *fiber.Ctx) []hypertext.Param {
+	params := make([]hypertext.Param, 0)
 	context.Request().Header.VisitAll(func(k, v []byte) {
-		params = append(params, types.HTTPParam{
+		params = append(params, hypertext.Param{
 			Key:   string(k),
 			Value: string(v),
 		})

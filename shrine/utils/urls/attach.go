@@ -1,20 +1,20 @@
 package urls
 
 import (
-	"shrine/types"
+	"shrine/enums"
 	"shrine/utils/logger"
 
 	"github.com/gofiber/fiber/v2"
 )
 
-var methodBinders = map[types.HTTPMethod]func(fiber.Router, string, fiber.Handler) fiber.Router{
-	types.GET:     func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Get(path, h) },
-	types.POST:    func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Post(path, h) },
-	types.PUT:     func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Put(path, h) },
-	types.PATCH:   func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Patch(path, h) },
-	types.DELETE:  func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Delete(path, h) },
-	types.OPTIONS: func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Options(path, h) },
-	types.HEAD:    func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Head(path, h) },
+var methodBinders = map[enums.HTTPMethod]func(fiber.Router, string, fiber.Handler) fiber.Router{
+	enums.GET:     func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Get(path, h) },
+	enums.POST:    func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Post(path, h) },
+	enums.PUT:     func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Put(path, h) },
+	enums.PATCH:   func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Patch(path, h) },
+	enums.DELETE:  func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Delete(path, h) },
+	enums.OPTIONS: func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Options(path, h) },
+	enums.HEAD:    func(r fiber.Router, path string, h fiber.Handler) fiber.Router { return r.Head(path, h) },
 }
 
 func Attach(app *fiber.App) {

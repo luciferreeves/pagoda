@@ -1,7 +1,7 @@
 package meta
 
 import (
-	"shrine/types"
+	"shrine/types/common"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -35,13 +35,13 @@ func (p Pagination) Apply(query *gorm.DB) *gorm.DB {
 	return query.Offset((p.Page - 1) * p.PerPage).Limit(p.PerPage)
 }
 
-func (p Pagination) Response(items any, total int64) types.PaginatedResponse {
+func (p Pagination) Response(items any, total int64) common.PaginatedResponse {
 	totalPages := int(total) / p.PerPage
 	if int(total)%p.PerPage > 0 {
 		totalPages++
 	}
 
-	return types.PaginatedResponse{
+	return common.PaginatedResponse{
 		Items:      items,
 		Total:      total,
 		Page:       p.Page,
