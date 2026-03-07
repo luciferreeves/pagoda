@@ -20,6 +20,7 @@ func main() {
 	app := fiber.New(fiber.Config{
 		DisableStartupMessage: true,
 		ErrorHandler:          router.ErrorHandler,
+		BodyLimit:             int(config.Storage.MaxFileSize) * 2,
 	})
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:  config.Server.CorsOrigins,
