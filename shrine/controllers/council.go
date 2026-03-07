@@ -10,11 +10,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
+var userSortColumns = []string{"username", "display_name", "email", "role", "created_at"}
+
 func ListUsersController(context *fiber.Ctx) error {
 	pagination := meta.Paginate(context)
+	sorting := meta.Sort(context, userSortColumns, "created_at")
 	search, _ := meta.Request(context).Query("search")
 
-	items, total := services.ListUsers(pagination, search)
+	items, total := services.ListUsers(pagination, sorting, search)
 	return shortcuts.Success(context, pagination.Response(items, total))
 }
 

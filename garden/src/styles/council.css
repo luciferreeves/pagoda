@@ -43,6 +43,16 @@
   border-bottom: 1px solid var(--color-border);
 }
 
+.council-sortable {
+  cursor: pointer;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.council-sortable:hover {
+  color: var(--color-text);
+}
+
 .council-grid-row {
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text);

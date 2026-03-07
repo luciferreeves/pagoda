@@ -13,6 +13,11 @@ type Pagination struct {
 	PerPage int
 }
 
+type Sorting struct {
+	Field     string
+	Direction string
+}
+
 func Paginate(context *fiber.Ctx) Pagination {
 	request := Request(context)
 
@@ -31,8 +36,36 @@ func Paginate(context *fiber.Ctx) Pagination {
 	return Pagination{Page: page, PerPage: perPage}
 }
 
+func Sort(context *fiber.Ctx, allowed []string, fallback string) Sorting {
+	request := Request(context)
+
+	field, _ := request.Query("sort")
+	direction, _ := request.Query("order")
+
+	valid := false
+	for _, column := range allowed {
+		if field == column {
+			valid = true
+			break
+		}
+	}
+	if !valid {
+		field = fallback
+	}
+
+	if direction != "asc" && direction != "desc" {
+		direction = "desc"
+	}
+
+	return Sorting{Field: field, Direction: direction}
+}
+
 func (self Pagination) Apply(query *gorm.DB) *gorm.DB {
 	return query.Offset((self.Page - 1) * self.PerPage).Limit(self.PerPage)
+}
+
+func (self Sorting) Apply(query *gorm.DB) *gorm.DB {
+	return query.Order(self.Field + " " + self.Direction)
 }
 
 func (self Pagination) Response(items any, total int64) common.PaginatedResponse {

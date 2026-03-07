@@ -30,6 +30,11 @@ export default function CouncilUsers() {
     return new Date(date).toLocaleDateString();
   }
 
+  function sortIndicator(field: string) {
+    if (council.sortField() !== field) return "";
+    return council.sortOrder() === "asc" ? " \u25B2" : " \u25BC";
+  }
+
   return (
     <section>
       <h2 class="page-title">Users</h2>
@@ -46,11 +51,11 @@ export default function CouncilUsers() {
 
       <div class="council-grid">
         <div class="council-grid-header">
-          <span>User</span>
-          <span>Email</span>
-          <span>Role</span>
+          <span class="council-sortable" onClick={() => council.toggleSort("display_name")}>User{sortIndicator("display_name")}</span>
+          <span class="council-sortable" onClick={() => council.toggleSort("email")}>Email{sortIndicator("email")}</span>
+          <span class="council-sortable" onClick={() => council.toggleSort("role")}>Role{sortIndicator("role")}</span>
           <span>Status</span>
-          <span>Joined</span>
+          <span class="council-sortable" onClick={() => council.toggleSort("created_at")}>Joined{sortIndicator("created_at")}</span>
         </div>
         <Show when={!council.loading()} fallback={
           <div class="council-grid-empty">Loading...</div>

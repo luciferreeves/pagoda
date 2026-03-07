@@ -71,7 +71,7 @@ func OnlineCitizens(limit int) []models.User {
 	return users
 }
 
-func ListUsers(p meta.Pagination, search string) ([]models.User, int64) {
+func ListUsers(pagination meta.Pagination, sorting meta.Sorting, search string) ([]models.User, int64) {
 	var users []models.User
 	var total int64
 
@@ -83,7 +83,7 @@ func ListUsers(p meta.Pagination, search string) ([]models.User, int64) {
 	}
 
 	query.Count(&total)
-	p.Apply(query.Order("created_at desc")).Find(&users)
+	pagination.Apply(sorting.Apply(query)).Find(&users)
 
 	return users, total
 }

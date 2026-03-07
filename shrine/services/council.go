@@ -21,8 +21,8 @@ import (
 	"time"
 )
 
-func ListUsers(pagination meta.Pagination, search string) ([]user.AdminUserResponse, int64) {
-	citizens, total := repositories.ListUsers(pagination, search)
+func ListUsers(pagination meta.Pagination, sorting meta.Sorting, search string) ([]user.AdminUserResponse, int64) {
+	citizens, total := repositories.ListUsers(pagination, sorting, search)
 
 	items := make([]user.AdminUserResponse, len(citizens))
 	for index, citizen := range citizens {

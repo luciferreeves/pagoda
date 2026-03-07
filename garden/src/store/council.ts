@@ -9,10 +9,17 @@ const [page, setPage] = createSignal(1);
 const [totalPages, setTotalPages] = createSignal(0);
 const [loading, setLoading] = createSignal(false);
 const [search, setSearch] = createSignal("");
+const [sortField, setSortField] = createSignal("created_at");
+const [sortOrder, setSortOrder] = createSignal<"asc" | "desc">("desc");
 
 async function loadUsers(p = 1, q = "") {
   setLoading(true);
-  const params = new URLSearchParams({ page: String(p), per_page: "20" });
+  const params = new URLSearchParams({
+    page: String(p),
+    per_page: "20",
+    sort: sortField(),
+    order: sortOrder(),
+  });
   if (q) params.set("search", q);
 
   const response = await api<PaginatedResponse<AdminUser>>(`/council/users?${params}`, {
@@ -28,6 +35,16 @@ async function loadUsers(p = 1, q = "") {
   setLoading(false);
 }
 
+function toggleSort(field: string) {
+  if (sortField() === field) {
+    setSortOrder(sortOrder() === "asc" ? "desc" : "asc");
+  } else {
+    setSortField(field);
+    setSortOrder("desc");
+  }
+  loadUsers(1, search());
+}
+
 export const council = {
   users,
   total,
@@ -37,4 +54,7 @@ export const council = {
   search,
   setSearch,
   loadUsers,
+  sortField,
+  sortOrder,
+  toggleSort,
 };
