@@ -16,14 +16,14 @@ type Token struct {
 	UserAgent string `gorm:"size:512"`
 }
 
-func (token *Token) BeforeCreate(tx *gorm.DB) error {
-	if token.TokenHash == "" {
+func (self *Token) BeforeCreate(tx *gorm.DB) error {
+	if self.TokenHash == "" {
 		return gorm.ErrInvalidData
 	}
-	if token.UserID == 0 {
+	if self.UserID == 0 {
 		return gorm.ErrInvalidData
 	}
-	if token.ExpiresAt.IsZero() {
+	if self.ExpiresAt.IsZero() {
 		return gorm.ErrInvalidData
 	}
 	return nil

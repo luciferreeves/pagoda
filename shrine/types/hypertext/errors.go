@@ -7,4 +7,4 @@ type ServiceError struct {
 	Message string
 }
 
-func (e *ServiceError) Error() string { return e.Message }
+func (self *ServiceError) Error() string { return self.Message }

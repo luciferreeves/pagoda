@@ -9,6 +9,7 @@ import (
 	"shrine/types/hypertext"
 	"shrine/types/letter"
 	"shrine/types/ticket"
+	"shrine/types/user"
 	"shrine/utils/sanitize"
 	"strings"
 )
@@ -138,4 +139,12 @@ func buildTicketMessageResponses(ticketMessages []models.TicketMessage) []ticket
 		responses[index] = message.ToResponse()
 	}
 	return responses
+}
+
+func buildCitizenSummaries(citizens []models.User) []user.CitizenSummaryResponse {
+	summaries := make([]user.CitizenSummaryResponse, len(citizens))
+	for index, citizen := range citizens {
+		summaries[index] = citizen.ToSummary()
+	}
+	return summaries
 }
