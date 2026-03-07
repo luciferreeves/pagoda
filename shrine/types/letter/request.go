@@ -1,13 +1,15 @@
 package letter
 
 type CreateRequest struct {
-	Recipients []string `json:"recipients"`
-	Title      string   `json:"title"`
-	Body       string   `json:"body"`
+	Recipients     []string `json:"recipients"`
+	Title          string   `json:"title"`
+	Body           string   `json:"body"`
+	AttachmentRefs []string `json:"attachment_refs"`
 }
 
 type SendMessageRequest struct {
-	Body string `json:"body"`
+	Body           string   `json:"body"`
+	AttachmentRefs []string `json:"attachment_refs"`
 }
 
 type EditMessageRequest struct {

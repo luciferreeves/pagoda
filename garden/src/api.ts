@@ -33,3 +33,18 @@ export async function api<T>(path: string, options: APIOptions = {}): Promise<AP
 
   return { ok: response.ok, status: response.status, data };
 }
+
+export async function uploadFile<T>(path: string, file: File, token: string): Promise<APIResponse<T>> {
+  const form = new FormData();
+  form.append("file", file);
+
+  const response = await fetch(`${API_URL}${path}`, {
+    method: "POST",
+    headers: { "Authorization": `Bearer ${token}` },
+    body: form,
+  });
+
+  const data = await response.json();
+
+  return { ok: response.ok, status: response.status, data };
+}

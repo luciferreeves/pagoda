@@ -178,28 +178,41 @@
   color: var(--color-text-muted);
 }
 
-.council-detail-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+.council-detail-back {
+  display: inline-block;
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-decoration: none;
   margin-bottom: 12px;
 }
 
-.council-detail-header .page-title {
-  margin-bottom: 0;
-  padding-bottom: 0;
-  border-bottom: none;
+.council-detail-back:hover {
+  color: var(--color-text);
 }
 
-.council-detail-avatar {
-  width: 48px;
-  height: 48px;
+.council-detail-layout {
+  display: grid;
+  grid-template-columns: 1fr 240px;
+  gap: 12px;
+  align-items: start;
+}
+
+.council-detail-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 12px;
+}
+
+.council-detail-card-avatar {
+  width: 100%;
+  aspect-ratio: 1;
   border-radius: 2px;
   object-fit: cover;
-  flex-shrink: 0;
 }
 
-.council-detail-handle {
+.council-detail-card-username {
   font-size: 12px;
   color: var(--color-text-muted);
 }
@@ -265,26 +278,6 @@
   gap: 6px;
 }
 
-.council-detail-action-row {
-  display: flex;
-  gap: 6px;
-}
-
-.council-detail-reason {
-  flex: 1;
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  padding: 4px 8px;
-  font-family: var(--font-body);
-  font-size: 12px;
-  color: var(--color-text);
-  outline: none;
-}
-
-.council-detail-reason:focus {
-  border-color: var(--color-red);
-}
-
 .council-detail-action-btn {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
@@ -298,6 +291,11 @@
 
 .council-detail-action-btn:hover {
   border-color: var(--color-text-muted);
+}
+
+.council-action-warn:hover {
+  color: var(--color-yellow);
+  border-color: var(--color-yellow);
 }
 
 .council-action-ban:hover {
@@ -320,13 +318,70 @@
   border-color: var(--color-green);
 }
 
-.council-detail-back {
-  display: inline-block;
-  font-size: 12px;
-  color: var(--color-text-muted);
-  text-decoration: none;
+.council-detail-value {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
 }
 
-.council-detail-back:hover {
+.council-detail-edit-trigger {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+  opacity: 0;
+}
+
+.council-detail-row:hover .council-detail-edit-trigger {
+  opacity: 1;
+}
+
+.council-detail-edit-trigger:hover {
   color: var(--color-text);
+}
+
+.council-detail-editable {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+}
+
+.council-detail-edit-input {
+  flex: 1;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 2px 6px;
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.council-detail-edit-input:focus {
+  border-color: var(--color-red);
+}
+
+.council-detail-edit-btn {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 2px 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.council-detail-edit-btn:hover {
+  border-color: var(--color-text-muted);
+}
+
+.council-action-save:hover {
+  color: var(--color-green);
+  border-color: var(--color-green);
 }

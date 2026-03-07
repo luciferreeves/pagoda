@@ -1,4 +1,5 @@
-import { type JSX, Show, For, onMount, onCleanup, createEffect } from "solid-js";
+import { type JSX, Show, onMount, onCleanup, createEffect } from "solid-js";
+import { For } from "solid-js/web";
 import { A } from "@solidjs/router";
 import Sidebar from "./Sidebar";
 import NavSection from "./NavSection";

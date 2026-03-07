@@ -84,7 +84,7 @@ func CreateLetter(userID uint, request letter.CreateRequest) (*common.MessageRes
 	if len(recipientIDs) == 1 && request.Title == "" {
 		existing := repositories.FindExistingDM(userID, recipientIDs[0])
 		if existing != nil {
-			_, err := repositories.SendMessage(existing.ID, userID, sanitizedBody, nil)
+			_, err := repositories.SendMessage(existing.ID, userID, sanitizedBody, request.AttachmentRefs)
 			if err != nil {
 				return nil, fail(enums.Internal, messages.FailedSendMessage)
 			}
@@ -92,7 +92,7 @@ func CreateLetter(userID uint, request letter.CreateRequest) (*common.MessageRes
 		}
 	}
 
-	record, err := repositories.CreateLetter(userID, strings.TrimSpace(request.Title), recipientIDs, sanitizedBody, nil)
+	record, err := repositories.CreateLetter(userID, strings.TrimSpace(request.Title), recipientIDs, sanitizedBody, request.AttachmentRefs)
 	if err != nil {
 		return nil, fail(enums.Internal, messages.FailedCreateLetter)
 	}
@@ -115,7 +115,7 @@ func SendLetterMessage(ref string, userID uint, request letter.SendMessageReques
 		return nil, serviceErr
 	}
 
-	message, err := repositories.SendMessage(record.ID, userID, sanitizedBody, nil)
+	message, err := repositories.SendMessage(record.ID, userID, sanitizedBody, request.AttachmentRefs)
 	if err != nil {
 		return nil, fail(enums.Internal, messages.FailedSendMessage)
 	}

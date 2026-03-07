@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"shrine/config"
 	"shrine/utils/logger"
@@ -32,6 +33,9 @@ func init() {
 }
 
 func Upload(path string, reader io.Reader, size int64, contentType string) error {
+	if Client == nil {
+		return fmt.Errorf("storage not configured")
+	}
 	_, err := Client.PutObject(context.Background(), config.Storage.Bucket, path, reader, size, minio.PutObjectOptions{
 		ContentType: contentType,
 	})
@@ -39,6 +43,9 @@ func Upload(path string, reader io.Reader, size int64, contentType string) error
 }
 
 func Delete(path string) error {
+	if Client == nil {
+		return fmt.Errorf("storage not configured")
+	}
 	return Client.RemoveObject(context.Background(), config.Storage.Bucket, path, minio.RemoveObjectOptions{})
 }
 
