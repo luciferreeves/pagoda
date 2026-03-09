@@ -34,7 +34,7 @@ import {
   IconMusic,
   IconVideo,
   IconFileZip,
-  IconFileTypePdf,
+
   IconTypography,
   IconDatabase,
   IconX,
@@ -50,6 +50,7 @@ interface AttachmentResult {
   url: string;
   file_size: number;
   content_type: string;
+  category: string;
 }
 
 interface EditorProps {
@@ -173,29 +174,22 @@ export default function Editor(props: EditorProps) {
     return dot >= 0 ? name.slice(dot + 1).toUpperCase() : "";
   }
 
-  const archiveMimes = ["application/zip", "application/x-rar-compressed", "application/gzip", "application/x-7z-compressed", "application/x-tar", "application/x-bzip2", "application/x-xz", "application/x-compress"];
-  const codeMimes = ["application/javascript", "application/json", "application/xml", "application/x-httpd-php", "application/x-sh", "application/x-python", "application/typescript"];
-  const docMimes = ["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "application/vnd.oasis.opendocument.text", "application/rtf", "application/epub+zip"];
-  const sheetMimes = ["application/vnd.ms-excel", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.oasis.opendocument.spreadsheet", "text/csv"];
-  const slideMimes = ["application/vnd.ms-powerpoint", "application/vnd.openxmlformats-officedocument.presentationml.presentation", "application/vnd.oasis.opendocument.presentation"];
-  const dbMimes = ["application/x-sqlite3", "application/vnd.ms-access"];
-
-  function fileIcon(contentType: string) {
+  function fileIcon(category: string) {
     const s = "24";
     const k = "1.5";
-    if (contentType.startsWith("image/")) return <IconPhoto size={s} stroke={k} />;
-    if (contentType.startsWith("audio/")) return <IconMusic size={s} stroke={k} />;
-    if (contentType.startsWith("video/")) return <IconVideo size={s} stroke={k} />;
-    if (contentType.startsWith("font/") || contentType === "application/font-sfnt" || contentType === "application/vnd.ms-fontobject" || contentType === "application/font-woff" || contentType === "application/font-woff2") return <IconTypography size={s} stroke={k} />;
-    if (contentType === "application/pdf") return <IconFileTypePdf size={s} stroke={k} />;
-    if (archiveMimes.includes(contentType)) return <IconFileZip size={s} stroke={k} />;
-    if (dbMimes.includes(contentType)) return <IconDatabase size={s} stroke={k} />;
-    if (docMimes.includes(contentType)) return <IconFileText size={s} stroke={k} />;
-    if (sheetMimes.includes(contentType)) return <IconFileSpreadsheet size={s} stroke={k} />;
-    if (slideMimes.includes(contentType)) return <IconPresentation size={s} stroke={k} />;
-    if (codeMimes.includes(contentType) || contentType.startsWith("text/x-")) return <IconFileCode size={s} stroke={k} />;
-    if (contentType.startsWith("text/")) return <IconFileText size={s} stroke={k} />;
-    return <IconFile size={s} stroke={k} />;
+    const icons: Record<string, () => any> = {
+      image: () => <IconPhoto size={s} stroke={k} />,
+      video: () => <IconVideo size={s} stroke={k} />,
+      audio: () => <IconMusic size={s} stroke={k} />,
+      font: () => <IconTypography size={s} stroke={k} />,
+      archive: () => <IconFileZip size={s} stroke={k} />,
+      database: () => <IconDatabase size={s} stroke={k} />,
+      document: () => <IconFileText size={s} stroke={k} />,
+      spreadsheet: () => <IconFileSpreadsheet size={s} stroke={k} />,
+      presentation: () => <IconPresentation size={s} stroke={k} />,
+      code: () => <IconFileCode size={s} stroke={k} />,
+    };
+    return (icons[category] || (() => <IconFile size={s} stroke={k} />))();
   }
 
   function closeAllPopups() {
@@ -621,10 +615,10 @@ export default function Editor(props: EditorProps) {
           <For each={attachments()}>
             {(attachment) => (
               <div class="editor-attachment" title={attachment.file_name}>
-                <Show when={attachment.content_type.startsWith("image/")} fallback={
-                  <Show when={attachment.content_type.startsWith("video/")} fallback={
+                <Show when={attachment.category === "image"} fallback={
+                  <Show when={attachment.category === "video"} fallback={
                     <div class="editor-attachment-tile">
-                      {fileIcon(attachment.content_type)}
+                      {fileIcon(attachment.category)}
                       <span class="editor-attachment-ext">{fileExtension(attachment.file_name)}</span>
                     </div>
                   }>
@@ -648,7 +642,7 @@ export default function Editor(props: EditorProps) {
                 <Show when={pending.type.startsWith("image/") && pending.preview} fallback={
                   <Show when={pending.type.startsWith("video/") && pending.preview} fallback={
                     <div class="editor-attachment-tile">
-                      {fileIcon(pending.type)}
+                      {fileIcon(pending.type.split("/")[0] || "other")}
                       <span class="editor-attachment-ext">{fileExtension(pending.name)}</span>
                     </div>
                   }>

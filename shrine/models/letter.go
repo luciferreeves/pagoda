@@ -50,6 +50,7 @@ type LetterAttachment struct {
 	FilePath    string `gorm:"size:512;not null"`
 	FileSize    int64  `gorm:"not null"`
 	ContentType string `gorm:"size:100;not null"`
+	Category    string `gorm:"size:20;not null;default:other"`
 }
 
 func (self *Letter) BeforeCreate(tx *gorm.DB) error {
@@ -89,6 +90,7 @@ func (self *LetterAttachment) ToResponse() letter.AttachmentResponse {
 		URL:         storage.ResolveCDN(self.FilePath),
 		FileSize:    self.FileSize,
 		ContentType: self.ContentType,
+		Category:    self.Category,
 	}
 }
 

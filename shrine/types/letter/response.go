@@ -18,6 +18,7 @@ type AttachmentResponse struct {
 	URL         string `json:"url"`
 	FileSize    int64  `json:"file_size"`
 	ContentType string `json:"content_type"`
+	Category    string `json:"category"`
 }
 
 type MessageResponse struct {

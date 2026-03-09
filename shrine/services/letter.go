@@ -11,6 +11,7 @@ import (
 	"shrine/types/common"
 	"shrine/types/hypertext"
 	"shrine/types/letter"
+	"shrine/utils/files"
 	"shrine/utils/meta"
 	"shrine/utils/storage"
 	"strings"
@@ -256,6 +257,7 @@ func UploadLetterAttachment(userID uint, fileName string, fileSize int64, conten
 		FileName:    fileName,
 		FileSize:    fileSize,
 		ContentType: contentType,
+		Category:    files.DetectCategory(contentType),
 	}
 
 	if err := repositories.UploadAttachment(userID, &attachment); err != nil {
