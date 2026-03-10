@@ -4,6 +4,7 @@ const (
 	InvalidRequestBody          = "Invalid request body."
 	InvalidUsernameOrPassword   = "Invalid username or password."
 	AccountBannedOrDisabled     = "Your account has been banned or disabled."
+	IPBanned                    = "Access from this IP address has been restricted."
 	EmailNotVerified            = "Your email address has not been verified. Please check your inbox."
 	VerificationTokenRequired   = "Verification token is required."
 	VerificationLinkInvalid     = "Your verification link is invalid or has expired."
@@ -21,4 +22,7 @@ const (
 	FailedCreateSession         = "Failed to create session."
 	FailedVerifyAccount         = "Failed to verify your account."
 	FailedEndSession            = "Failed to end your session."
+	EmailSubjectVerify          = "Verify your Pagoda account"
+	EmailSubjectDisabled        = "Your Pagoda account has been disabled"
+	EmailSubjectBanned          = "Your Pagoda account has been banned"
 )

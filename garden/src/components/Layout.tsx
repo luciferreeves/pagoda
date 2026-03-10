@@ -1,6 +1,6 @@
 import { type JSX, Show, onMount, onCleanup, createEffect } from "solid-js";
 import { For } from "solid-js/web";
-import { A } from "@solidjs/router";
+import { A, useLocation } from "@solidjs/router";
 import Sidebar from "./Sidebar";
 import NavSection from "./NavSection";
 import { auth } from "../store/auth";
@@ -13,9 +13,29 @@ interface LayoutProps {
 
 export default function Layout(props: LayoutProps) {
   let heartbeatInterval: ReturnType<typeof setInterval> | undefined;
+  const location = useLocation();
 
   onMount(() => {
     auth.initialize();
+    stats.load();
+
+    function handleExternalLinks(event: MouseEvent) {
+      const anchor = (event.target as HTMLElement).closest("a");
+      if (!anchor || !anchor.href) return;
+      try {
+        const url = new URL(anchor.href);
+        if (url.hostname !== window.location.hostname) {
+          anchor.setAttribute("target", "_blank");
+          anchor.setAttribute("rel", "noopener noreferrer");
+        }
+      } catch {}
+    }
+    document.addEventListener("click", handleExternalLinks);
+    onCleanup(() => document.removeEventListener("click", handleExternalLinks));
+  });
+
+  createEffect(() => {
+    location.pathname;
     stats.load();
   });
 
@@ -60,7 +80,7 @@ export default function Layout(props: LayoutProps) {
               }>
                 {((user) => (
                   <>
-                    <li><A href={`/u/${user.username}`}>My Domain</A></li>
+                    <li><A href={`/p/${user.username}`}>My Domain</A></li>
                     <li><A href="/letters">Letters</A></li>
                     <li><A href="/account">Account</A></li>
                     <li><A href="/account/settings">Settings</A></li>
@@ -94,15 +114,16 @@ export default function Layout(props: LayoutProps) {
           <Show when={auth.user()?.role === UserRole.Owner || auth.user()?.role === UserRole.Admin || auth.user()?.role === UserRole.Moderator}>
             <NavSection title="Council" accent="red">
               <ul>
-                <li><A href="/council/users">Users</A></li>
-                <li><A href="/council/reports">Reports</A></li>
-                <li><A href="/council/forums">Forums</A></li>
-                <li><A href="/council/districts">Districts</A></li>
-                <li><A href="/council/bazaar">Bazaar</A></li>
                 <Show when={auth.user()?.role === UserRole.Owner || auth.user()?.role === UserRole.Admin}>
-                  <li><A href="/council/audit-log">Audit Log</A></li>
                   <li><A href="/council/announcements">Announcements</A></li>
+                  <li><A href="/council/audit-log">Audit Log</A></li>
+                  <li><A href="/council/bannedips">Banned IPs</A></li>
                 </Show>
+                <li><A href="/council/bazaar">Bazaar</A></li>
+                <li><A href="/council/districts">Districts</A></li>
+                <li><A href="/council/forums">Forums</A></li>
+                <li><A href="/council/reports">Reports</A></li>
+                <li><A href="/council/users">Users</A></li>
               </ul>
             </NavSection>
           </Show>
@@ -128,7 +149,7 @@ export default function Layout(props: LayoutProps) {
                 <For each={stats.data()?.newest_citizens}>
                   {(citizen) => (
                     <li class="citizen-item">
-                      <A href={`/u/${citizen.username}`}>
+                      <A href={`/p/${citizen.username}`}>
                         <img src={citizen.avatar_url} alt="" class="citizen-avatar" />
                         {citizen.display_name}
                       </A>
@@ -146,7 +167,7 @@ export default function Layout(props: LayoutProps) {
                 <For each={stats.data()?.online_citizens}>
                   {(citizen) => (
                     <li class="citizen-item">
-                      <A href={`/u/${citizen.username}`}>
+                      <A href={`/p/${citizen.username}`}>
                         <img src={citizen.avatar_url} alt="" class="citizen-avatar" />
                         {citizen.display_name}
                       </A>

@@ -2,6 +2,7 @@ import { createSignal, onMount, Show, For } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import { council } from "../../store/council";
 import type { AdminUser } from "../../types/admin";
+import StaffGuard from "../../components/StaffGuard";
 
 export default function CouncilUsers() {
   const navigate = useNavigate();
@@ -36,6 +37,7 @@ export default function CouncilUsers() {
   }
 
   return (
+    <StaffGuard>
     <section>
       <h2 class="page-title">Users</h2>
 
@@ -112,5 +114,6 @@ export default function CouncilUsers() {
         </div>
       </Show>
     </section>
+    </StaffGuard>
   );
 }

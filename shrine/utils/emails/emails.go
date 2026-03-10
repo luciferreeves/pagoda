@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/smtp"
 	"shrine/config"
+	"shrine/messages"
 	"strconv"
 
 	"github.com/flosch/pongo2/v6"
@@ -19,15 +20,15 @@ func init() {
 	var err error
 	activationTemplate, err = pongo2.FromFile("templates/activation.html")
 	if err != nil {
-		panic(fmt.Sprintf("failed to load activation template: %v", err))
+		panic(fmt.Sprintf(messages.FailedLoadTemplate, "activation", err))
 	}
 	disabledTemplate, err = pongo2.FromFile("templates/account_disabled.html")
 	if err != nil {
-		panic(fmt.Sprintf("failed to load disabled template: %v", err))
+		panic(fmt.Sprintf(messages.FailedLoadTemplate, "disabled", err))
 	}
 	bannedTemplate, err = pongo2.FromFile("templates/account_banned.html")
 	if err != nil {
-		panic(fmt.Sprintf("failed to load banned template: %v", err))
+		panic(fmt.Sprintf(messages.FailedLoadTemplate, "banned", err))
 	}
 }
 
@@ -60,7 +61,7 @@ func SendActivation(to string, username string, token string) error {
 		return err
 	}
 
-	return Send(to, "Verify your Pagoda account", html)
+	return Send(to, messages.EmailSubjectVerify, html)
 }
 
 func SendDisabledNotification(to string, username string, reason string, disabledUntil string) error {
@@ -73,7 +74,7 @@ func SendDisabledNotification(to string, username string, reason string, disable
 		return err
 	}
 
-	return Send(to, "Your Pagoda account has been disabled", html)
+	return Send(to, messages.EmailSubjectDisabled, html)
 }
 
 func SendBannedNotification(to string, username string, reason string) error {
@@ -85,5 +86,5 @@ func SendBannedNotification(to string, username string, reason string) error {
 		return err
 	}
 
-	return Send(to, "Your Pagoda account has been banned", html)
+	return Send(to, messages.EmailSubjectBanned, html)
 }

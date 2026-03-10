@@ -16,7 +16,7 @@ func RegisterController(context *fiber.Ctx) error {
 		return shortcuts.BadRequest(context, err)
 	}
 
-	result, serviceErr := services.Register(body)
+	result, serviceErr := services.Register(body, meta.Request(context).IP)
 	if serviceErr != nil {
 		return shortcuts.HandleError(context, serviceErr)
 	}
@@ -30,7 +30,7 @@ func LoginController(context *fiber.Ctx) error {
 		return shortcuts.BadRequest(context, err)
 	}
 
-	citizen, serviceErr := services.Authenticate(body)
+	citizen, serviceErr := services.Authenticate(body, meta.Request(context).IP)
 	if serviceErr != nil {
 		return shortcuts.HandleError(context, serviceErr)
 	}

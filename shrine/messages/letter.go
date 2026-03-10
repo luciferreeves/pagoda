@@ -29,4 +29,11 @@ const (
 	FailedUploadFile            = "Failed to upload file."
 	LetterRenamed               = "Letter renamed."
 	LeftConversation            = "You have left the conversation."
+	RecipientNotFound           = "User '%s' not found."
+	ParticipantRemoved          = "%s has been removed."
+	FileExceedsMaxSize          = "File exceeds the maximum size of %d MB."
+	SystemMessageTitle          = "System Message"
+	EmptyConversationTitle      = "Empty Conversation"
+	LetterTitleTwo              = "%s and %s"
+	LetterTitleMany             = "%s, %s, and %d others"
 )

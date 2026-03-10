@@ -70,7 +70,7 @@ func CreateLetter(userID uint, request letter.CreateRequest) (*common.MessageRes
 	for _, username := range request.Recipients {
 		recipient, err := repositories.FindUserByUsername(username)
 		if err != nil {
-			return nil, fail(enums.BadRequest, fmt.Sprintf("User '%s' not found.", username))
+			return nil, fail(enums.BadRequest, fmt.Sprintf(messages.RecipientNotFound, username))
 		}
 		if recipient.ID == userID {
 			continue
@@ -245,12 +245,12 @@ func RemoveLetterParticipant(ref string, ownerID uint, request letter.RemovePart
 		return nil, fail(enums.Internal, messages.FailedRemoveParticipant)
 	}
 
-	return &common.MessageResponse{Message: fmt.Sprintf("%s has been removed.", target.DisplayName)}, nil
+	return &common.MessageResponse{Message: fmt.Sprintf(messages.ParticipantRemoved, target.DisplayName)}, nil
 }
 
 func UploadLetterAttachment(userID uint, fileName string, fileSize int64, contentType string, reader io.Reader) (*letter.AttachmentResponse, *hypertext.ServiceError) {
 	if fileSize > config.Storage.MaxFileSize {
-		return nil, fail(enums.BadRequest, fmt.Sprintf("File exceeds the maximum size of %d MB.", config.Storage.MaxFileSize/1024/1024))
+		return nil, fail(enums.BadRequest, fmt.Sprintf(messages.FileExceedsMaxSize, config.Storage.MaxFileSize/1024/1024))
 	}
 
 	attachment := models.LetterAttachment{

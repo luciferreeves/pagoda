@@ -1,11 +1,15 @@
 import { createSignal, onMount, Show, For } from "solid-js";
 import { useParams, A } from "@solidjs/router";
-import { api } from "../../api";
+import { api, uploadFile } from "../../api";
 import { auth } from "../../store/auth";
 import { UserRole } from "../../types/roles";
 import type { AdminUser } from "../../types/admin";
 import Modal from "../../components/Modal";
 import Editor from "../../components/Editor";
+import StaffGuard from "../../components/StaffGuard";
+import DatePicker from "../../components/DatePicker";
+import MonthDayPicker from "../../components/MonthDayPicker";
+import MiniEditor from "../../components/MiniEditor";
 
 export default function CouncilUser() {
   const params = useParams();
@@ -13,12 +17,24 @@ export default function CouncilUser() {
   const [error, setError] = createSignal("");
   const [actionError, setActionError] = createSignal("");
   const [editing, setEditing] = createSignal<Record<string, string>>({});
-  const [modal, setModal] = createSignal<"warn" | "disable" | "ban" | null>(null);
+  const [modal, setModal] = createSignal<"warn" | "disable" | "ban" | "jade" | null>(null);
   const [warnTitle, setWarnTitle] = createSignal("");
   const [warnBody, setWarnBody] = createSignal("");
   const [disableReason, setDisableReason] = createSignal("");
   const [disableUntil, setDisableUntil] = createSignal("");
   const [banReason, setBanReason] = createSignal("");
+  const [jadeAmount, setJadeAmount] = createSignal("");
+  const [editingBio, setEditingBio] = createSignal(false);
+  const [bioHtml, setBioHtml] = createSignal("");
+  const [editingSignature, setEditingSignature] = createSignal(false);
+  const [signatureHtml, setSignatureHtml] = createSignal("");
+  const [editingBirthday, setEditingBirthday] = createSignal(false);
+  const [birthdayValue, setBirthdayValue] = createSignal("");
+  const [signatureImage, setSignatureImage] = createSignal<File | null>(null);
+  const [uploadingImage, setUploadingImage] = createSignal(false);
+  const [modalError, setModalError] = createSignal("");
+  const [submitting, setSubmitting] = createSignal(false);
+  const [existingImageUrl, setExistingImageUrl] = createSignal("");
 
   onMount(async () => {
     const response = await api<AdminUser>(`/council/users/${params.username}`, {
@@ -101,6 +117,24 @@ export default function CouncilUser() {
     }
   }
 
+  async function saveField(field: string, value: string) {
+    const target = user();
+    if (!target) return;
+    setActionError("");
+
+    const response = await api<AdminUser>(`/council/users/${target.username}`, {
+      method: "PATCH",
+      token: auth.token(),
+      body: { [field]: value },
+    });
+
+    if (response.ok) {
+      setUser(response.data);
+    } else {
+      setActionError((response.data as unknown as { error: string }).error);
+    }
+  }
+
   async function saveRole(role: string) {
     const target = user();
     if (!target) return;
@@ -120,10 +154,16 @@ export default function CouncilUser() {
     }
   }
 
+  function extractImageUrl(html: string): string {
+    const match = html?.match(/<img\s+[^>]*src="([^"]+)"/);
+    return match ? match[1] : "";
+  }
+
   async function submitWarn() {
     const target = user();
     if (!target) return;
-    setActionError("");
+    setModalError("");
+    setSubmitting(true);
 
     const response = await api<AdminUser>(`/council/users/${target.username}/warn`, {
       method: "POST",
@@ -131,20 +171,22 @@ export default function CouncilUser() {
       body: { title: warnTitle(), message: warnBody() },
     });
 
+    setSubmitting(false);
     if (response.ok) {
       setUser(response.data);
       setModal(null);
       setWarnTitle("");
       setWarnBody("");
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setModalError((response.data as unknown as { error: string }).error);
     }
   }
 
   async function submitDisable() {
     const target = user();
     if (!target) return;
-    setActionError("");
+    setModalError("");
+    setSubmitting(true);
 
     const body: Record<string, string> = { reason: disableReason() };
     if (disableUntil()) body.disabled_until = new Date(disableUntil()).toISOString();
@@ -155,20 +197,22 @@ export default function CouncilUser() {
       body,
     });
 
+    setSubmitting(false);
     if (response.ok) {
       setUser(response.data);
       setModal(null);
       setDisableReason("");
       setDisableUntil("");
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setModalError((response.data as unknown as { error: string }).error);
     }
   }
 
   async function submitBan() {
     const target = user();
     if (!target) return;
-    setActionError("");
+    setModalError("");
+    setSubmitting(true);
 
     const response = await api<AdminUser>(`/council/users/${target.username}/ban`, {
       method: "POST",
@@ -176,12 +220,13 @@ export default function CouncilUser() {
       body: { reason: banReason() },
     });
 
+    setSubmitting(false);
     if (response.ok) {
       setUser(response.data);
       setModal(null);
       setBanReason("");
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setModalError((response.data as unknown as { error: string }).error);
     }
   }
 
@@ -219,6 +264,34 @@ export default function CouncilUser() {
     }
   }
 
+  async function submitGiftJade() {
+    const target = user();
+    if (!target) return;
+    setModalError("");
+
+    const amount = parseInt(jadeAmount());
+    if (isNaN(amount) || amount < 1) {
+      setModalError("Enter a valid jade amount (minimum 1).");
+      return;
+    }
+
+    setSubmitting(true);
+    const response = await api<AdminUser>(`/council/users/${target.username}`, {
+      method: "PATCH",
+      token: auth.token(),
+      body: { jade: target.jade + amount },
+    });
+
+    setSubmitting(false);
+    if (response.ok) {
+      setUser(response.data);
+      setModal(null);
+      setJadeAmount("");
+    } else {
+      setModalError((response.data as unknown as { error: string }).error);
+    }
+  }
+
   function EditableField(props: { label: string; field: string; value: string }) {
     return (
       <Show when={editing()[props.field] !== undefined} fallback={
@@ -240,6 +313,7 @@ export default function CouncilUser() {
               class="council-detail-edit-input"
               value={editing()[props.field]}
               onInput={(e) => setEditing((prev) => ({ ...prev, [props.field]: e.currentTarget.value }))}
+              onKeyDown={(e) => { if (e.key === "Enter") saveEdit(props.field); if (e.key === "Escape") cancelEdit(props.field); }}
             />
             <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveEdit(props.field)}>Save</button>
             <button type="button" class="council-detail-edit-btn" onClick={() => cancelEdit(props.field)}>Cancel</button>
@@ -291,6 +365,7 @@ export default function CouncilUser() {
   }
 
   return (
+    <StaffGuard>
     <section>
       <A href="/council/users" class="council-detail-back">&larr; Back to Users</A>
 
@@ -313,12 +388,146 @@ export default function CouncilUser() {
                     <EditableField label="Username" field="username" value={target().username} />
                     <EditableField label="Display Name" field="display_name" value={target().display_name} />
                     <EditableField label="Email" field="email" value={target().email} />
-                    <EditableField label="Bio" field="bio" value={target().bio} />
-                    <EditableField label="Website" field="website" value={target().website} />
+                    <Show when={editingBio()} fallback={
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Bio</span>
+                        <span class="council-detail-value">
+                          <Show when={target().bio} fallback={<span>—</span>}>
+                            <span class="council-detail-html" innerHTML={target().bio} />
+                          </Show>
+                          <Show when={isAdmin()}>
+                            <button type="button" class="council-detail-edit-trigger" onClick={() => setEditingBio(true)}>Edit</button>
+                          </Show>
+                        </span>
+                      </div>
+                    }>
+                      <div class="council-detail-row council-detail-row-editor">
+                        <span class="council-detail-label">Bio</span>
+                        <div class="council-detail-editor-wrap">
+                          <MiniEditor onHtml={setBioHtml} initialHtml={target().bio} />
+                          <div class="council-detail-editor-actions">
+                            <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => { saveField("bio", bioHtml()); setEditingBio(false); }}>Save</button>
+                            <button type="button" class="council-detail-edit-btn" onClick={() => setEditingBio(false)}>Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </Show>
+                    <Show when={editing()["website"] !== undefined} fallback={
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Website</span>
+                        <span class="council-detail-value">
+                          <Show when={target().website} fallback={<span>—</span>}>
+                            <a href={target().website} target="_blank" rel="noopener noreferrer">{target().website}</a>
+                          </Show>
+                          <Show when={isAdmin()}>
+                            <button type="button" class="council-detail-edit-trigger" onClick={() => startEdit("website", target().website)}>Edit</button>
+                          </Show>
+                        </span>
+                      </div>
+                    }>
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Website</span>
+                        <span class="council-detail-editable">
+                          <input
+                            type="text"
+                            class="council-detail-edit-input"
+                            value={editing()["website"]}
+                            onInput={(event) => setEditing((prev) => ({ ...prev, website: event.currentTarget.value }))}
+                            onKeyDown={(e) => { if (e.key === "Enter") saveEdit("website"); if (e.key === "Escape") cancelEdit("website"); }}
+                          />
+                          <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveEdit("website")}>Save</button>
+                          <button type="button" class="council-detail-edit-btn" onClick={() => cancelEdit("website")}>Cancel</button>
+                        </span>
+                      </div>
+                    </Show>
                     <EditableField label="Location" field="location" value={target().location} />
                     <EditableField label="Pronouns" field="pronouns" value={target().pronouns} />
-                    <EditableField label="Birthday" field="birthday" value={target().birthday?.split("T")[0] ?? ""} />
-                    <EditableField label="Signature" field="signature" value={target().signature} />
+                    <Show when={editingBirthday()} fallback={
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Birthday</span>
+                        <span class="council-detail-value">
+                          <span>{target().birthday ? (() => { const raw = target().birthday!; const parts = raw.includes("T") ? raw.split("T")[0].split("-") : raw.split("-"); const month = parseInt(parts.length === 3 ? parts[1] : parts[0]) - 1; const day = parseInt(parts.length === 3 ? parts[2] : parts[1]); const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]; return `${months[month]} ${day}`; })() : "—"}</span>
+                          <Show when={isAdmin()}>
+                            <button type="button" class="council-detail-edit-trigger" onClick={() => setEditingBirthday(true)}>Edit</button>
+                          </Show>
+                        </span>
+                      </div>
+                    }>
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Birthday</span>
+                        <span class="council-detail-editable">
+                          <MonthDayPicker
+                            value={(() => { const raw = target().birthday; if (!raw) return ""; const parts = raw.includes("T") ? raw.split("T")[0].split("-") : raw.split("-"); return parts.length === 3 ? `${parts[1]}-${parts[2]}` : raw; })()}
+                            onChange={setBirthdayValue}
+                          />
+                          <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => { saveField("birthday", birthdayValue()); setEditingBirthday(false); }}>Save</button>
+                          <button type="button" class="council-detail-edit-btn" onClick={() => setEditingBirthday(false)}>Cancel</button>
+                        </span>
+                      </div>
+                    </Show>
+                    <Show when={editingSignature()} fallback={
+                      <div class="council-detail-row">
+                        <span class="council-detail-label">Signature</span>
+                        <span class="council-detail-value">
+                          <Show when={target().signature} fallback={<span>—</span>}>
+                            <span class="council-detail-html" innerHTML={target().signature} />
+                          </Show>
+                          <Show when={isAdmin()}>
+                            <button type="button" class="council-detail-edit-trigger" onClick={() => { setExistingImageUrl(extractImageUrl(target().signature)); setEditingSignature(true); }}>Edit</button>
+                          </Show>
+                        </span>
+                      </div>
+                    }>
+                      <div class="council-detail-row council-detail-row-editor">
+                        <span class="council-detail-label">Signature</span>
+                        <div class="council-detail-editor-wrap">
+                          <MiniEditor onHtml={setSignatureHtml} initialHtml={target().signature} />
+                          <div class="council-detail-signature-image">
+                            <Show when={signatureImage()}>
+                              <img src={URL.createObjectURL(signatureImage()!)} alt="" class="council-detail-image-preview" />
+                            </Show>
+                            <Show when={!signatureImage() && existingImageUrl()}>
+                              <img src={existingImageUrl()} alt="" class="council-detail-image-preview" />
+                            </Show>
+                            <label class="council-detail-file-label">
+                              <span>{signatureImage() ? signatureImage()!.name : existingImageUrl() ? "Replace image" : "Attach image (optional)"}</span>
+                              <input
+                                type="file"
+                                accept="image/*"
+                                class="council-detail-file-input"
+                                onChange={(e) => setSignatureImage(e.currentTarget.files?.[0] ?? null)}
+                              />
+                            </label>
+                            <Show when={signatureImage() || existingImageUrl()}>
+                              <button type="button" class="council-detail-edit-btn" onClick={() => { setSignatureImage(null); setExistingImageUrl(""); }}>Remove</button>
+                            </Show>
+                          </div>
+                          <div class="council-detail-editor-actions">
+                            <button type="button" class="council-detail-edit-btn council-action-save" disabled={uploadingImage()} onClick={async () => {
+                              let html = signatureHtml();
+                              const file = signatureImage();
+                              if (file) {
+                                setUploadingImage(true);
+                                const result = await uploadFile<{ url: string }>("/council/upload", file, auth.token()!);
+                                setUploadingImage(false);
+                                if (!result.ok) {
+                                  setActionError((result.data as unknown as { error: string }).error);
+                                  return;
+                                }
+                                html += `<img src="${result.data.url}" alt="" class="signature-image" />`;
+                              } else if (existingImageUrl()) {
+                                html += `<img src="${existingImageUrl()}" alt="" class="signature-image" />`;
+                              }
+                              saveField("signature", html);
+                              setEditingSignature(false);
+                              setSignatureImage(null);
+                              setExistingImageUrl("");
+                            }}>{uploadingImage() ? "Uploading..." : "Save"}</button>
+                            <button type="button" class="council-detail-edit-btn" onClick={() => { setEditingSignature(false); setSignatureImage(null); setExistingImageUrl(""); }}>Cancel</button>
+                          </div>
+                        </div>
+                      </div>
+                    </Show>
                   </div>
                 </div>
 
@@ -350,10 +559,6 @@ export default function CouncilUser() {
                       <span class="council-detail-label">Last Seen</span>
                       <span>{formatDate(target().last_seen_at)}</span>
                     </div>
-                    <div class="council-detail-row">
-                      <span class="council-detail-label">IP</span>
-                      <span>{target().registration_ip || "\u2014"}</span>
-                    </div>
                     <Show when={target().account_banned}>
                       <div class="council-detail-row">
                         <span class="council-detail-label">Banned At</span>
@@ -362,7 +567,7 @@ export default function CouncilUser() {
                       <Show when={target().banned_reason}>
                         <div class="council-detail-row">
                           <span class="council-detail-label">Ban Reason</span>
-                          <span>{target().banned_reason}</span>
+                          <span class="council-detail-html" innerHTML={target().banned_reason} />
                         </div>
                       </Show>
                     </Show>
@@ -380,7 +585,7 @@ export default function CouncilUser() {
                       <Show when={target().disabled_reason}>
                         <div class="council-detail-row">
                           <span class="council-detail-label">Reason</span>
-                          <span>{target().disabled_reason}</span>
+                          <span class="council-detail-html" innerHTML={target().disabled_reason} />
                         </div>
                       </Show>
                     </Show>
@@ -403,7 +608,7 @@ export default function CouncilUser() {
                   <div class="council-detail-section">
                     <div class="council-detail-section-header">Actions</div>
                     <div class="council-detail-actions">
-                      <button type="button" class="council-detail-action-btn council-action-warn" onClick={() => setModal("warn")}>
+                      <button type="button" class="council-detail-action-btn council-action-warn" onClick={() => { setModalError(""); setModal("warn"); }}>
                         Warn
                       </button>
                       <Show when={!target().account_disabled} fallback={
@@ -411,7 +616,7 @@ export default function CouncilUser() {
                           Enable
                         </button>
                       }>
-                        <button type="button" class="council-detail-action-btn council-action-disable" onClick={() => setModal("disable")}>
+                        <button type="button" class="council-detail-action-btn council-action-disable" onClick={() => { setModalError(""); setModal("disable"); }}>
                           Disable
                         </button>
                       </Show>
@@ -420,10 +625,24 @@ export default function CouncilUser() {
                           Unban
                         </button>
                       }>
-                        <button type="button" class="council-detail-action-btn council-action-ban" onClick={() => setModal("ban")}>
+                        <button type="button" class="council-detail-action-btn council-action-ban" onClick={() => { setModalError(""); setModal("ban"); }}>
                           Ban
                         </button>
                       </Show>
+                    </div>
+                  </div>
+                </Show>
+
+                <Show when={isAdmin()}>
+                  <div class="council-detail-section">
+                    <div class="council-detail-section-header">Gifts</div>
+                    <div class="council-detail-actions">
+                      <button type="button" class="council-detail-action-btn council-action-jade" onClick={() => { setModalError(""); setModal("jade"); }}>
+                        Gift Jade
+                      </button>
+                      <button type="button" class="council-detail-action-btn council-action-items" disabled>
+                        Gift Items
+                      </button>
                     </div>
                   </div>
                 </Show>
@@ -446,9 +665,12 @@ export default function CouncilUser() {
                   <label class="modal-label">Message</label>
                   <Editor onHtml={setWarnBody} />
                 </div>
+                <Show when={modalError()}>
+                  <div class="form-error">{modalError()}</div>
+                </Show>
                 <div class="modal-actions">
-                  <button type="button" class="council-detail-action-btn council-action-warn" onClick={submitWarn}>Send Warning</button>
-                  <button type="button" class="council-detail-action-btn" onClick={() => setModal(null)}>Cancel</button>
+                  <button type="button" class="council-detail-action-btn council-action-warn" disabled={submitting()} onClick={submitWarn}>{submitting() ? "Sending..." : "Send Warning"}</button>
+                  <button type="button" class="council-detail-action-btn" disabled={submitting()} onClick={() => setModal(null)}>Cancel</button>
                 </div>
               </Modal>
             </Show>
@@ -461,16 +683,14 @@ export default function CouncilUser() {
                 </div>
                 <div class="modal-field">
                   <label class="modal-label">Disabled Until (optional)</label>
-                  <input
-                    type="date"
-                    class="modal-input"
-                    value={disableUntil()}
-                    onInput={(e) => setDisableUntil(e.currentTarget.value)}
-                  />
+                  <DatePicker value={disableUntil()} onChange={setDisableUntil} />
                 </div>
+                <Show when={modalError()}>
+                  <div class="form-error">{modalError()}</div>
+                </Show>
                 <div class="modal-actions">
-                  <button type="button" class="council-detail-action-btn council-action-disable" onClick={submitDisable}>Disable</button>
-                  <button type="button" class="council-detail-action-btn" onClick={() => setModal(null)}>Cancel</button>
+                  <button type="button" class="council-detail-action-btn council-action-disable" disabled={submitting()} onClick={submitDisable}>{submitting() ? "Disabling..." : "Disable"}</button>
+                  <button type="button" class="council-detail-action-btn" disabled={submitting()} onClick={() => setModal(null)}>Cancel</button>
                 </div>
               </Modal>
             </Show>
@@ -481,9 +701,35 @@ export default function CouncilUser() {
                   <label class="modal-label">Reason</label>
                   <Editor onHtml={setBanReason} />
                 </div>
+                <Show when={modalError()}>
+                  <div class="form-error">{modalError()}</div>
+                </Show>
                 <div class="modal-actions">
-                  <button type="button" class="council-detail-action-btn council-action-ban" onClick={submitBan}>Ban</button>
-                  <button type="button" class="council-detail-action-btn" onClick={() => setModal(null)}>Cancel</button>
+                  <button type="button" class="council-detail-action-btn council-action-ban" disabled={submitting()} onClick={submitBan}>{submitting() ? "Banning..." : "Ban"}</button>
+                  <button type="button" class="council-detail-action-btn" disabled={submitting()} onClick={() => setModal(null)}>Cancel</button>
+                </div>
+              </Modal>
+            </Show>
+
+            <Show when={modal() === "jade"}>
+              <Modal title="Gift Jade" onClose={() => setModal(null)}>
+                <div class="modal-field">
+                  <label class="modal-label">Amount</label>
+                  <input
+                    type="number"
+                    class="modal-input"
+                    placeholder="Enter jade amount..."
+                    min="1"
+                    value={jadeAmount()}
+                    onInput={(e) => setJadeAmount(e.currentTarget.value)}
+                  />
+                </div>
+                <Show when={modalError()}>
+                  <div class="form-error">{modalError()}</div>
+                </Show>
+                <div class="modal-actions">
+                  <button type="button" class="council-detail-action-btn council-action-jade" disabled={submitting()} onClick={submitGiftJade}>{submitting() ? "Gifting..." : "Gift Jade"}</button>
+                  <button type="button" class="council-detail-action-btn" disabled={submitting()} onClick={() => setModal(null)}>Cancel</button>
                 </div>
               </Modal>
             </Show>
@@ -491,5 +737,6 @@ export default function CouncilUser() {
         )}
       </Show>
     </section>
+    </StaffGuard>
   );
 }

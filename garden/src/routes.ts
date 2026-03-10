@@ -11,5 +11,6 @@ export const routes: RouteDefinition[] = [
   { path: "/account/reactivate", component: lazy(() => import("./pages/account/reactivate")) },
   { path: "/council/users", component: lazy(() => import("./pages/council/users")) },
   { path: "/council/users/:username", component: lazy(() => import("./pages/council/user")) },
+  { path: "/council/bannedips", component: lazy(() => import("./pages/council/bannedips")) },
   { path: "**", component: lazy(() => import("./errors/404")) },
 ];

@@ -491,7 +491,7 @@ export default function Editor(props: EditorProps) {
         if (showHeadings() && !target.closest(".editor-toolbar-dropdown-wrap:has(.editor-dropdown)")) {
           setShowHeadings(false);
         }
-        if (showEmoji() && !target.closest(".editor-emoji-popup")) {
+        if (showEmoji() && !target.closest(".editor-emoji-popup") && target !== emojiBtnRef && !emojiBtnRef.contains(target)) {
           setShowEmoji(false);
         }
       }

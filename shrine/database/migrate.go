@@ -18,6 +18,7 @@ func migrate() {
 		&models.TicketCategory{},
 		&models.Ticket{},
 		&models.TicketMessage{},
+		&models.IPBan{},
 	)
 	if err != nil {
 		logger.Fatalf("Database", "Error during database migration: %v", err)

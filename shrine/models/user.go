@@ -3,6 +3,7 @@ package models
 import (
 	"errors"
 	"shrine/enums"
+	"shrine/messages"
 	"shrine/types/user"
 	"shrine/utils/storage"
 	"shrine/utils/validators"
@@ -45,15 +46,15 @@ type User struct {
 	DisabledUntil   *time.Time
 	WarningCount    uint       `gorm:"not null;default:0"`
 	LastSeenAt      *time.Time
-	RegistrationIP  string     `gorm:"size:45"`
+	IP              string     `gorm:"size:45"`
 }
 
 func (self *User) SetPassword(password string) error {
 	if len(password) < 8 {
-		return errors.New("Password must be at least 8 characters.")
+		return errors.New(messages.PasswordTooShort)
 	}
 	if len(password) > 255 {
-		return errors.New("Password must be at most 255 characters.")
+		return errors.New(messages.PasswordTooLong)
 	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
@@ -150,7 +151,6 @@ func (self *User) ToAdminResponse() user.AdminUserResponse {
 		DisabledAt:      self.DisabledAt,
 		DisabledUntil:   self.DisabledUntil,
 		LastSeenAt:      self.LastSeenAt,
-		RegistrationIP:  self.RegistrationIP,
 	}
 }
 
@@ -167,23 +167,23 @@ func (self *User) BeforeCreate(tx *gorm.DB) error {
 
 	if !bypassUsername {
 		if !validators.IsValidUsername(self.Username, 3) {
-			return errors.New("Username must be 3-32 characters and can only contain letters, numbers, and underscores.")
+			return errors.New(messages.InvalidUsername)
 		}
 		if validators.IsReservedUsername(self.Username) {
-			return errors.New("This username is not available.")
+			return errors.New(messages.UsernameNotAvailable)
 		}
 	}
 
 	if !validators.IsValidEmail(self.Email) {
-		return errors.New("Please enter a valid email address.")
+		return errors.New(messages.InvalidEmail)
 	}
 
 	if len(strings.TrimSpace(self.DisplayName)) < 1 || len(strings.TrimSpace(self.DisplayName)) > 50 {
-		return errors.New("Display name must be between 1 and 50 characters.")
+		return errors.New(messages.InvalidDisplayName)
 	}
 
 	if self.PasswordHash == "" {
-		return errors.New("Password is required.")
+		return errors.New(messages.PasswordRequired)
 	}
 
 	self.Email = strings.ToLower(strings.TrimSpace(self.Email))
@@ -195,11 +195,15 @@ func (self *User) BeforeCreate(tx *gorm.DB) error {
 
 func (self *User) BeforeUpdate(tx *gorm.DB) error {
 	if !validators.IsValidEmail(self.Email) {
-		return errors.New("Please enter a valid email address.")
+		return errors.New(messages.InvalidEmail)
 	}
 
 	if len(strings.TrimSpace(self.DisplayName)) < 1 || len(strings.TrimSpace(self.DisplayName)) > 50 {
-		return errors.New("Display name must be between 1 and 50 characters.")
+		return errors.New(messages.InvalidDisplayName)
+	}
+
+	if self.Jade > validators.MaxJade {
+		return errors.New(messages.JadeExceedsMax)
 	}
 
 	self.Email = strings.ToLower(strings.TrimSpace(self.Email))

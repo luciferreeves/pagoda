@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"regexp"
 	"shrine/enums"
 	"shrine/messages"
 	"shrine/models"
@@ -23,6 +24,10 @@ func ResolveUser(username string) (*models.User, *hypertext.ServiceError) {
 }
 
 func mapRegistrationError(err error) *hypertext.ServiceError {
+	return mapUserError(err)
+}
+
+func mapUserError(err error) *hypertext.ServiceError {
 	if strings.Contains(err.Error(), "users.username") {
 		return fail(enums.Conflict, messages.UsernameAlreadyExists)
 	}
@@ -66,7 +71,7 @@ func computeTitle(record *models.Letter, participants []models.LetterParticipant
 	}
 
 	if record.IsSystem {
-		return "System Message"
+		return messages.SystemMessageTitle
 	}
 
 	var others []string
@@ -78,13 +83,13 @@ func computeTitle(record *models.Letter, participants []models.LetterParticipant
 
 	switch len(others) {
 	case 0:
-		return "Empty Conversation"
+		return messages.EmptyConversationTitle
 	case 1:
 		return others[0]
 	case 2:
-		return fmt.Sprintf("%s and %s", others[0], others[1])
+		return fmt.Sprintf(messages.LetterTitleTwo, others[0], others[1])
 	default:
-		return fmt.Sprintf("%s, %s, and %d others", others[0], others[1], len(others)-2)
+		return fmt.Sprintf(messages.LetterTitleMany, others[0], others[1], len(others)-2)
 	}
 }
 
@@ -147,4 +152,14 @@ func buildCitizenSummaries(citizens []models.User) []user.CitizenSummaryResponse
 		summaries[index] = citizen.ToSummary()
 	}
 	return summaries
+}
+
+var imgSrcPattern = regexp.MustCompile(`<img\s+[^>]*src="([^"]+)"`)
+
+func extractImageURL(html string) string {
+	match := imgSrcPattern.FindStringSubmatch(html)
+	if len(match) < 2 {
+		return ""
+	}
+	return match[1]
 }

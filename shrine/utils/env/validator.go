@@ -1,14 +1,15 @@
 package env
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
+	"shrine/messages"
 )
 
 func validateConfigInput(config any) (reflect.Value, reflect.Type, error) {
 	v := reflect.ValueOf(config)
 	if v.Kind() != reflect.Pointer || v.Elem().Kind() != reflect.Struct {
-		return reflect.Value{}, nil, fmt.Errorf("config must be a pointer to struct")
+		return reflect.Value{}, nil, errors.New(messages.ConfigMustBePointer)
 	}
 	elem := v.Elem()
 	return elem, elem.Type(), nil

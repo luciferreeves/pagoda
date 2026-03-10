@@ -34,4 +34,9 @@ func init() {
 
 	urls.Path(enums.GET, "/audit", auth.RequireStaff(controllers.ListAuditLogsController), "audit")
 	urls.Path(enums.GET, "/audit/:ref", auth.RequireStaff(controllers.GetAuditLogController), "auditdetail")
+
+	urls.Path(enums.GET, "/bannedips", auth.RequireAdmin(controllers.ListIPBansController), "bannedips")
+	urls.Path(enums.DELETE, "/bannedips/:id", auth.RequireAdmin(controllers.DeleteIPBanController), "bannedipdelete")
+
+	urls.Path(enums.POST, "/upload", auth.RequireAdmin(controllers.UploadImageController), "upload")
 }

@@ -38,7 +38,6 @@ type AdminUserResponse struct {
 	DisabledAt      *time.Time `json:"disabled_at"`
 	DisabledUntil   *time.Time `json:"disabled_until"`
 	LastSeenAt      *time.Time `json:"last_seen_at"`
-	RegistrationIP  string     `json:"registration_ip"`
 }
 
 type StatsResponse struct {

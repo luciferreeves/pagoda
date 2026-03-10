@@ -16,6 +16,7 @@ import (
 	"shrine/utils/emails"
 	"shrine/utils/logger"
 	"shrine/utils/sanitize"
+	"shrine/utils/storage"
 	"shrine/utils/validators"
 	"strings"
 	"time"
@@ -60,11 +61,17 @@ func BanUser(admin *models.User, target *models.User, request council.BanRequest
 		return nil, fail(enums.Internal, messages.FailedBanUser)
 	}
 
-	if sanitizedMessage != "" {
-		repositories.CreateSystemLetter(target.ID, fmt.Sprintf("Account Banned [%s]", ref), sanitizedMessage, ref)
+	repositories.DeleteUserTokens(target.ID)
+
+	if target.IP != "" {
+		repositories.CreateIPBan(target.IP, fmt.Sprintf(messages.AuditBannedIP, target.Username))
 	}
 
-	repositories.LogAction(admin.ID, "user.ban", "user", target.Username, fmt.Sprintf("Banned user @%s", target.Username), audit.BanDetails{
+	if sanitizedMessage != "" {
+		repositories.CreateSystemLetter(target.ID, fmt.Sprintf(messages.SystemLetterBanned, ref), sanitizedMessage, ref)
+	}
+
+	repositories.LogAction(admin.ID, "user.ban", "user", target.Username, fmt.Sprintf(messages.AuditBannedUser, target.Username), audit.BanDetails{
 		Reason:    request.Reason,
 		SystemRef: ref,
 	})
@@ -87,7 +94,11 @@ func UnbanUser(admin *models.User, target *models.User) (*user.AdminUserResponse
 		return nil, fail(enums.Internal, messages.FailedUnbanUser)
 	}
 
-	repositories.LogAction(admin.ID, "user.unban", "user", target.Username, fmt.Sprintf("Unbanned user @%s", target.Username), nil)
+	if target.IP != "" {
+		repositories.DeleteIPBan(target.IP)
+	}
+
+	repositories.LogAction(admin.ID, "user.unban", "user", target.Username, fmt.Sprintf(messages.AuditUnbannedUser, target.Username), nil)
 
 	response := target.ToAdminResponse()
 	return &response, nil
@@ -121,11 +132,13 @@ func DisableUser(admin *models.User, target *models.User, request council.Disabl
 		return nil, fail(enums.Internal, messages.FailedDisableUser)
 	}
 
+	repositories.DeleteUserTokens(target.ID)
+
 	if sanitizedMessage != "" {
-		repositories.CreateSystemLetter(target.ID, fmt.Sprintf("Account Disabled [%s]", ref), sanitizedMessage, ref)
+		repositories.CreateSystemLetter(target.ID, fmt.Sprintf(messages.SystemLetterDisabled, ref), sanitizedMessage, ref)
 	}
 
-	repositories.LogAction(admin.ID, "user.disable", "user", target.Username, fmt.Sprintf("Disabled user @%s", target.Username), audit.DisableDetails{
+	repositories.LogAction(admin.ID, "user.disable", "user", target.Username, fmt.Sprintf(messages.AuditDisabledUser, target.Username), audit.DisableDetails{
 		Reason:        request.Reason,
 		DisabledUntil: request.DisabledUntil,
 		SystemRef:     ref,
@@ -150,7 +163,7 @@ func EnableUser(admin *models.User, target *models.User) (*user.AdminUserRespons
 		return nil, fail(enums.Internal, messages.FailedEnableUser)
 	}
 
-	repositories.LogAction(admin.ID, "user.enable", "user", target.Username, fmt.Sprintf("Enabled user @%s", target.Username), nil)
+	repositories.LogAction(admin.ID, "user.enable", "user", target.Username, fmt.Sprintf(messages.AuditEnabledUser, target.Username), nil)
 
 	response := target.ToAdminResponse()
 	return &response, nil
@@ -184,7 +197,7 @@ func ChangeRole(admin *models.User, target *models.User, request council.ChangeR
 		return nil, fail(enums.Internal, messages.FailedChangeRole)
 	}
 
-	repositories.LogAction(admin.ID, "user.role_change", "user", target.Username, fmt.Sprintf("Changed role of @%s from %s to %s", target.Username, oldRole, request.Role), audit.RoleChangeDetails{
+	repositories.LogAction(admin.ID, "user.role_change", "user", target.Username, fmt.Sprintf(messages.AuditChangedRole, target.Username, oldRole, request.Role), audit.RoleChangeDetails{
 		OldRole: oldRole,
 		NewRole: request.Role,
 	})
@@ -231,10 +244,16 @@ func EditUser(admin *models.User, target *models.User, request council.EditUserR
 		if *request.Birthday == "" {
 			target.Birthday = nil
 		} else {
-			parsed, err := time.Parse("2006-01-02", *request.Birthday)
+			var parsed time.Time
+			var err error
+			parsed, err = time.Parse("01-02", *request.Birthday)
 			if err != nil {
-				return nil, fail(enums.BadRequest, "Invalid birthday format. Use YYYY-MM-DD.")
+				parsed, err = time.Parse("2006-01-02", *request.Birthday)
+				if err != nil {
+					return nil, fail(enums.BadRequest, messages.InvalidBirthdayFormat)
+				}
 			}
+			parsed = time.Date(1904, parsed.Month(), parsed.Day(), 0, 0, 0, 0, time.UTC)
 			target.Birthday = &parsed
 		}
 		changes = append(changes, audit.FieldChange{Field: "birthday", Old: nil, New: nil})
@@ -266,11 +285,22 @@ func EditUser(admin *models.User, target *models.User, request council.EditUserR
 	}
 
 	if request.Signature != nil {
+		oldImageURL := extractImageURL(target.Signature)
+		newImageURL := extractImageURL(*request.Signature)
+		if oldImageURL != "" && oldImageURL != newImageURL {
+			oldPath := storage.PathFromCDN(oldImageURL)
+			if oldPath != "" {
+				storage.Delete(oldPath)
+			}
+		}
 		target.Signature = *request.Signature
 		changes = append(changes, audit.FieldChange{Field: "signature", Old: nil, New: nil})
 	}
 
 	if request.Jade != nil {
+		if !validators.IsValidJade(*request.Jade) {
+			return nil, fail(enums.BadRequest, messages.JadeExceedsMax)
+		}
 		changes = append(changes, audit.FieldChange{Field: "jade", Old: target.Jade, New: *request.Jade})
 		target.Jade = *request.Jade
 	}
@@ -285,10 +315,10 @@ func EditUser(admin *models.User, target *models.User, request council.EditUserR
 	}
 
 	if err := repositories.UpdateUser(target); err != nil {
-		return nil, fail(enums.Internal, messages.FailedUpdateUser)
+		return nil, mapUserError(err)
 	}
 
-	repositories.LogAction(admin.ID, "user.edit", "user", target.Username, fmt.Sprintf("Edited user @%s", target.Username), audit.EditUserDetails{
+	repositories.LogAction(admin.ID, "user.edit", "user", target.Username, fmt.Sprintf(messages.AuditEditedUser, target.Username), audit.EditUserDetails{
 		Changes: changes,
 	})
 

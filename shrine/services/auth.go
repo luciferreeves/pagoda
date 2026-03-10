@@ -11,11 +11,16 @@ import (
 	"shrine/utils/crypto"
 )
 
-func Register(request account.RegisterRequest) (*common.MessageResponse, *hypertext.ServiceError) {
+func Register(request account.RegisterRequest, ip string) (*common.MessageResponse, *hypertext.ServiceError) {
+	if repositories.IsIPBanned(ip) {
+		return nil, fail(enums.Forbidden, messages.IPBanned)
+	}
+
 	citizen := models.User{
 		Username:    request.Username,
 		Email:       request.Email,
 		DisplayName: request.DisplayName,
+		IP:          ip,
 	}
 
 	if err := citizen.SetPassword(request.Password); err != nil {
@@ -33,10 +38,14 @@ func Register(request account.RegisterRequest) (*common.MessageResponse, *hypert
 	return &common.MessageResponse{Message: messages.AccountCreated}, nil
 }
 
-func Authenticate(request account.LoginRequest) (*models.User, *hypertext.ServiceError) {
+func Authenticate(request account.LoginRequest, ip string) (*models.User, *hypertext.ServiceError) {
 	citizen, err := repositories.FindUserByUsername(request.Username)
 	if err != nil {
 		return nil, fail(enums.Unauthorized, messages.InvalidUsernameOrPassword)
+	}
+
+	if !citizen.IsStaff() && repositories.IsIPBanned(ip) {
+		return nil, fail(enums.Forbidden, messages.IPBanned)
 	}
 
 	if citizen.ClearExpiredDisable() {
@@ -54,6 +63,9 @@ func Authenticate(request account.LoginRequest) (*models.User, *hypertext.Servic
 	if !citizen.IsVerified() {
 		return nil, fail(enums.Forbidden, messages.EmailNotVerified)
 	}
+
+	citizen.IP = ip
+	repositories.UpdateUser(citizen)
 
 	return citizen, nil
 }

@@ -35,7 +35,7 @@ func WarnUser(admin *models.User, target *models.User, request warning.WarnReque
 		return nil, fail(enums.Internal, messages.FailedCreateWarning)
 	}
 
-	repositories.LogAction(admin.ID, "user.warn", "user", target.Username, fmt.Sprintf("Warned user @%s", target.Username), audit.WarningDetails{
+	repositories.LogAction(admin.ID, "user.warn", "user", target.Username, fmt.Sprintf(messages.AuditWarnedUser, target.Username), audit.WarningDetails{
 		WarningRef: record.SystemRef,
 		Title:      title,
 		Message:    sanitizedMessage,
@@ -59,7 +59,7 @@ func DeactivateWarning(admin *models.User, ref string) (*warning.WarningResponse
 		return nil, fail(enums.Internal, messages.FailedDeactivateWarn)
 	}
 
-	repositories.LogAction(admin.ID, "user.unwarn", "user", "", fmt.Sprintf("Deactivated warning %s", record.SystemRef), audit.DeactivateWarningDetails{
+	repositories.LogAction(admin.ID, "user.unwarn", "user", "", fmt.Sprintf(messages.AuditDeactivatedWarn, record.SystemRef), audit.DeactivateWarningDetails{
 		WarningRef: record.SystemRef,
 	})
 

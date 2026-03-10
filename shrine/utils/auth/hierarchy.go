@@ -2,20 +2,21 @@ package auth
 
 import (
 	"fmt"
+	"shrine/messages"
 	"shrine/models"
 )
 
 func ValidateHierarchy(admin *models.User, target *models.User, action string) error {
 	if target.ID == admin.ID {
-		return fmt.Errorf("You cannot %s yourself.", action)
+		return fmt.Errorf(messages.CannotActionSelf, action)
 	}
 
 	if target.IsOwner() {
-		return fmt.Errorf("You cannot %s the owner.", action)
+		return fmt.Errorf(messages.CannotActionOwner, action)
 	}
 
 	if target.IsAdmin() && !admin.IsOwner() {
-		return fmt.Errorf("Only the owner can %s an administrator.", action)
+		return fmt.Errorf(messages.OnlyOwnerCanActionAdmin, action)
 	}
 
 	return nil

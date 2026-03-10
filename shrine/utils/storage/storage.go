@@ -2,9 +2,10 @@ package storage
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"shrine/config"
+	"shrine/messages"
 	"shrine/utils/logger"
 	"strings"
 
@@ -34,7 +35,7 @@ func init() {
 
 func Upload(path string, reader io.Reader, size int64, contentType string) error {
 	if Client == nil {
-		return fmt.Errorf("storage not configured")
+		return errors.New(messages.StorageNotConfigured)
 	}
 	_, err := Client.PutObject(context.Background(), config.Storage.Bucket, path, reader, size, minio.PutObjectOptions{
 		ContentType: contentType,
@@ -44,7 +45,7 @@ func Upload(path string, reader io.Reader, size int64, contentType string) error
 
 func Delete(path string) error {
 	if Client == nil {
-		return fmt.Errorf("storage not configured")
+		return errors.New(messages.StorageNotConfigured)
 	}
 	return Client.RemoveObject(context.Background(), config.Storage.Bucket, path, minio.RemoveObjectOptions{})
 }
@@ -54,4 +55,12 @@ func ResolveCDN(path string) string {
 		return ""
 	}
 	return strings.TrimRight(config.Storage.CDN, "/") + "/" + config.Storage.Bucket + "/" + path
+}
+
+func PathFromCDN(cdnURL string) string {
+	prefix := strings.TrimRight(config.Storage.CDN, "/") + "/" + config.Storage.Bucket + "/"
+	if !strings.HasPrefix(cdnURL, prefix) {
+		return ""
+	}
+	return strings.TrimPrefix(cdnURL, prefix)
 }

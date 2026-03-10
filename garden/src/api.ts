@@ -29,7 +29,8 @@ export async function api<T>(path: string, options: APIOptions = {}): Promise<AP
     body: options.body ? JSON.stringify(options.body) : undefined,
   });
 
-  const data = await response.json();
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
 
   return { ok: response.ok, status: response.status, data };
 }
@@ -44,7 +45,8 @@ export async function uploadFile<T>(path: string, file: File, token: string): Pr
     body: form,
   });
 
-  const data = await response.json();
+  const text = await response.text();
+  const data = text ? JSON.parse(text) : null;
 
   return { ok: response.ok, status: response.status, data };
 }

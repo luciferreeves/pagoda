@@ -385,3 +385,109 @@
   color: var(--color-green);
   border-color: var(--color-green);
 }
+
+.council-action-jade:hover {
+  color: var(--color-cyan);
+  border-color: var(--color-cyan);
+}
+
+.council-action-items {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.council-detail-html {
+  font-size: 12px;
+  color: var(--color-text);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.council-detail-html a {
+  color: var(--color-link);
+}
+
+.council-detail-html a:hover {
+  color: var(--color-link-hover);
+}
+
+.council-detail-row-editor {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.council-detail-row-editor .council-detail-label {
+  margin-bottom: 4px;
+}
+
+.council-detail-editor-wrap {
+  flex: 1;
+}
+
+.council-detail-editor-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.council-detail-signature-image {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.council-detail-file-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: none;
+  border: 1px dashed var(--color-text-muted);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.council-detail-file-label:hover {
+  border-color: var(--color-red);
+  color: var(--color-text);
+}
+
+.council-detail-file-input {
+  display: none;
+}
+
+.editor-mini .editor-root {
+  min-height: 60px;
+  max-height: 120px;
+}
+
+.council-grid-bannedips .council-grid-header,
+.council-grid-bannedips .council-grid-row {
+  grid-template-columns: 2fr 4fr 2fr 1fr;
+}
+
+.council-ip {
+  font-family: var(--font-mono, monospace);
+}
+
+.council-detail-html img {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+.council-detail-image-preview {
+  max-width: 200px;
+  max-height: 100px;
+  object-fit: contain;
+  border: 1px solid var(--color-border);
+  border-radius: 2px;
+}
+
+.council-detail-action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

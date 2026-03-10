@@ -21,3 +21,7 @@ func FindValidToken(tokenHash string) (*models.Token, error) {
 func DeleteToken(tokenHash string) error {
 	return database.DB.Where("token_hash = ?", tokenHash).Delete(&models.Token{}).Error
 }
+
+func DeleteUserTokens(userID uint) {
+	database.DB.Where("user_id = ?", userID).Delete(&models.Token{})
+}

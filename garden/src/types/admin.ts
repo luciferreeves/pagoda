@@ -23,7 +23,6 @@ export interface AdminUser {
   disabled_at: string | null;
   disabled_until: string | null;
   last_seen_at: string | null;
-  registration_ip: string;
   created_at: string;
 }
 

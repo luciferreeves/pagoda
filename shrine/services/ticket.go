@@ -195,7 +195,7 @@ func UpdateTicket(adminID uint, ref string, request ticket.UpdateRequest) (*tick
 		return nil, fail(enums.Internal, messages.FailedUpdateTicket)
 	}
 
-	repositories.LogAction(adminID, "ticket.update", "ticket", record.Ref, fmt.Sprintf("Updated ticket %s", record.Ref), request)
+	repositories.LogAction(adminID, "ticket.update", "ticket", record.Ref, fmt.Sprintf(messages.AuditUpdatedTicket, record.Ref), request)
 
 	record, _ = repositories.FindTicketByRef(record.Ref)
 	response := record.ToResponse()
