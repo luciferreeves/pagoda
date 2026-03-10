@@ -24,7 +24,10 @@ func FindDistrictSiteByRef(ref string) (*models.DistrictSite, error) {
 func FindDistrictSiteByURL(url string) (*models.DistrictSite, error) {
 	var site models.DistrictSite
 	err := database.DB.Where("url = ?", url).First(&site).Error
-	return &site, err
+	if err != nil {
+		return nil, err
+	}
+	return &site, nil
 }
 
 func ListDistrictSites(pagination meta.Pagination, district string, tag string, search string) ([]models.DistrictSite, int64) {
