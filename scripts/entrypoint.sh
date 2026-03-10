@@ -13,7 +13,7 @@ if [ "$SEED" = "true" ]; then
       -H "Authorization: Bearer ${TURSO_TOKEN}" \
       -H "Content-Type: application/json" \
       -d '{"requests":[{"type":"execute","stmt":{"sql":"SELECT name FROM sqlite_master WHERE type='\''table'\'' AND name NOT LIKE '\''sqlite_%'\'' AND name NOT LIKE '\''_litestream%'\''"}},{"type":"close"}]}' \
-      | sed 's/{"type":"text","value":"/\n/g' | sed -n 's/"}.*/\1/p' | sed 's/}.*//')
+      | grep -o '"type":"text","value":"[^"]*"' | sed 's/.*"value":"//;s/"//')
     if [ -n "$TABLES" ]; then
       STMTS=""
       for TABLE in $TABLES; do
