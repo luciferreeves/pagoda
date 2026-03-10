@@ -118,7 +118,7 @@ export default function Layout(props: LayoutProps) {
               <ul>
                 <Show when={auth.user()?.role === UserRole.Owner || auth.user()?.role === UserRole.Admin}>
                   <li><A href="/council/announcements">Announcements</A></li>
-                  <li><A href="/council/audit-log">Audit Log</A></li>
+                  <li><A href="/council/auditlog">Audit Log</A></li>
                   <li><A href="/council/bannedips">Banned IPs</A></li>
                 </Show>
                 <li><A href="/council/bazaar">Bazaar</A></li>

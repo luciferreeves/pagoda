@@ -12,5 +12,7 @@ export const routes: RouteDefinition[] = [
   { path: "/council/users", component: lazy(() => import("./pages/council/users")) },
   { path: "/council/users/:username", component: lazy(() => import("./pages/council/user")) },
   { path: "/council/bannedips", component: lazy(() => import("./pages/council/bannedips")) },
+  { path: "/council/auditlog", component: lazy(() => import("./pages/council/auditlog")) },
+  { path: "/council/auditlog/:ref", component: lazy(() => import("./pages/council/auditdetail")) },
   { path: "**", component: lazy(() => import("./errors/404")) },
 ];

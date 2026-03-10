@@ -1,4 +1,5 @@
 import { createSignal, onMount, Show, For } from "solid-js";
+import { useSearchParams } from "@solidjs/router";
 import { api } from "../../api";
 import { auth } from "../../store/auth";
 import StaffGuard from "../../components/StaffGuard";
@@ -20,6 +21,7 @@ interface PaginatedResponse {
 }
 
 export default function BannedIPs() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [bans, setBans] = createSignal<IPBan[]>([]);
   const [page, setPage] = createSignal(1);
   const [totalPages, setTotalPages] = createSignal(1);
@@ -29,6 +31,7 @@ export default function BannedIPs() {
 
   async function loadBans(p = 1) {
     setLoading(true);
+    setSearchParams({ page: String(p) });
     const response = await api<PaginatedResponse>(`/council/bannedips?page=${p}`, {
       token: auth.token(),
     });
@@ -52,7 +55,10 @@ export default function BannedIPs() {
     }
   }
 
-  onMount(() => loadBans());
+  onMount(() => {
+    const p = parseInt(searchParams.page as string) || 1;
+    loadBans(p);
+  });
 
   function formatDate(date: string) {
     return new Date(date).toLocaleDateString();

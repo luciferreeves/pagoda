@@ -1,22 +1,29 @@
 import { createSignal, onMount, Show, For } from "solid-js";
-import { useNavigate } from "@solidjs/router";
+import { useNavigate, useSearchParams } from "@solidjs/router";
 import { council } from "../../store/council";
+import { ROLE_LABELS } from "../../types/roles";
 import type { AdminUser } from "../../types/admin";
 import StaffGuard from "../../components/StaffGuard";
 
 export default function CouncilUsers() {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [searchInput, setSearchInput] = createSignal("");
 
-  onMount(() => council.loadUsers());
+  onMount(() => {
+    const p = parseInt(searchParams.page as string) || 1;
+    council.loadUsers(p, council.search());
+  });
 
   function handleSearch(event: Event) {
     event.preventDefault();
     council.setSearch(searchInput());
+    setSearchParams({ page: "1" });
     council.loadUsers(1, searchInput());
   }
 
   function goToPage(p: number) {
+    setSearchParams({ page: String(p) });
     council.loadUsers(p, council.search());
   }
 
@@ -77,7 +84,7 @@ export default function CouncilUsers() {
                   </span>
                   <span>{user.email}</span>
                   <span>
-                    <span class={`council-role council-role-${user.role}`}>{user.role}</span>
+                    <span class={`council-role council-role-${user.role}`}>{ROLE_LABELS[user.role] || user.role}</span>
                   </span>
                   <span>
                     <span class={`council-status council-status-${statusBadge(user)}`}>

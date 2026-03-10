@@ -1,8 +1,8 @@
-import { createSignal, onMount, Show, For } from "solid-js";
+import { createSignal, onMount, onCleanup, Show, For } from "solid-js";
 import { useParams, A } from "@solidjs/router";
 import { api, uploadFile } from "../../api";
 import { auth } from "../../store/auth";
-import { UserRole } from "../../types/roles";
+import { UserRole, ROLE_LABELS } from "../../types/roles";
 import type { AdminUser } from "../../types/admin";
 import Modal from "../../components/Modal";
 import Editor from "../../components/Editor";
@@ -324,18 +324,34 @@ export default function CouncilUser() {
   }
 
   function RoleField(props: { role: string }) {
+    const [roleOpen, setRoleOpen] = createSignal(false);
+    let roleRef: HTMLDivElement | undefined;
+
     const availableRoles = () => {
       const roles: UserRole[] = [UserRole.Member, UserRole.Moderator];
       if (auth.user()?.role === UserRole.Owner) roles.push(UserRole.Admin);
       return roles;
     };
 
+    onMount(() => {
+      function handleClickOutside(e: MouseEvent) {
+        if (roleRef && !roleRef.contains(e.target as Node)) setRoleOpen(false);
+      }
+      document.addEventListener("mousedown", handleClickOutside);
+      onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
+    });
+
+    function pickRole(role: string) {
+      setEditing((prev: Record<string, string>) => ({ ...prev, role }));
+      setRoleOpen(false);
+    }
+
     return (
       <Show when={editing()["role"] !== undefined} fallback={
         <div class="council-detail-row">
           <span class="council-detail-label">Role</span>
           <span class="council-detail-value">
-            <span class={`council-role council-role-${props.role}`}>{props.role}</span>
+            <span class={`council-role council-role-${props.role}`}>{ROLE_LABELS[props.role] || props.role}</span>
             <Show when={canChangeRole()}>
               <button type="button" class="council-detail-edit-trigger" onClick={() => startEdit("role", props.role)}>Edit</button>
             </Show>
@@ -345,17 +361,20 @@ export default function CouncilUser() {
         <div class="council-detail-row">
           <span class="council-detail-label">Role</span>
           <span class="council-detail-editable">
-            <select
-              class="council-detail-role-select"
-              aria-label="Change role"
-              title="Change role"
-              value={editing()["role"]}
-              onChange={(e) => setEditing((prev: Record<string, string>) => ({ ...prev, role: e.currentTarget.value }))}
-            >
-              <For each={availableRoles()}>
-                {(role: UserRole) => <option value={role}>{role}</option>}
-              </For>
-            </select>
+            <div class="council-audit-dropdown" ref={roleRef}>
+              <button type="button" class="council-audit-dropdown-trigger" onClick={() => setRoleOpen(!roleOpen())}>
+                {ROLE_LABELS[editing()["role"]] || editing()["role"]}
+              </button>
+              <Show when={roleOpen()}>
+                <div class="council-audit-dropdown-menu">
+                  <For each={availableRoles()}>
+                    {(role: UserRole) => (
+                      <button type="button" class="council-audit-dropdown-item" classList={{ "council-audit-dropdown-item-selected": editing()["role"] === role }} onClick={() => pickRole(role)}>{ROLE_LABELS[role]}</button>
+                    )}
+                  </For>
+                </div>
+              </Show>
+            </div>
             <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveRole(editing()["role"])}>Save</button>
             <button type="button" class="council-detail-edit-btn" onClick={() => cancelEdit("role")}>Cancel</button>
           </span>
@@ -600,7 +619,7 @@ export default function CouncilUser() {
                     <img src={target().avatar_url} alt="" class="council-detail-card-avatar" />
                     <span class="council-detail-card-username">@{target().username}</span>
                     <span class={`council-status council-status-${statusBadge()}`}>{statusBadge()}</span>
-                    <span class={`council-role council-role-${target().role}`}>{target().role}</span>
+                    <span class={`council-role council-role-${target().role}`}>{ROLE_LABELS[target().role] || target().role}</span>
                   </div>
                 </div>
 

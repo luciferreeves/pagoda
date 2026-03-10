@@ -1,7 +1,7 @@
 import { createSignal } from "solid-js";
 import { api } from "../api";
 import { auth } from "./auth";
-import type { AdminUser, PaginatedResponse } from "../types/admin";
+import type { AdminUser, AuditLogEntry, PaginatedResponse } from "../types/admin";
 
 const [users, setUsers] = createSignal<AdminUser[]>([]);
 const [total, setTotal] = createSignal(0);
@@ -45,6 +45,36 @@ function toggleSort(field: string) {
   loadUsers(1, search());
 }
 
+const [auditLogs, setAuditLogs] = createSignal<AuditLogEntry[]>([]);
+const [auditTotal, setAuditTotal] = createSignal(0);
+const [auditPage, setAuditPage] = createSignal(1);
+const [auditTotalPages, setAuditTotalPages] = createSignal(0);
+const [auditLoading, setAuditLoading] = createSignal(false);
+const [auditAction, setAuditAction] = createSignal("");
+const [auditTargetType, setAuditTargetType] = createSignal("");
+
+async function loadAuditLogs(p = 1) {
+  setAuditLoading(true);
+  const params = new URLSearchParams({
+    page: String(p),
+    per_page: "20",
+  });
+  if (auditAction()) params.set("action", auditAction());
+  if (auditTargetType()) params.set("target_type", auditTargetType());
+
+  const response = await api<PaginatedResponse<AuditLogEntry>>(`/council/audit?${params}`, {
+    token: auth.token(),
+  });
+
+  if (response.ok) {
+    setAuditLogs(response.data.items);
+    setAuditTotal(response.data.total);
+    setAuditPage(response.data.page);
+    setAuditTotalPages(response.data.total_pages);
+  }
+  setAuditLoading(false);
+}
+
 export const council = {
   users,
   total,
@@ -57,4 +87,14 @@ export const council = {
   sortField,
   sortOrder,
   toggleSort,
+  auditLogs,
+  auditTotal,
+  auditPage,
+  auditTotalPages,
+  auditLoading,
+  auditAction,
+  setAuditAction,
+  auditTargetType,
+  setAuditTargetType,
+  loadAuditLogs,
 };

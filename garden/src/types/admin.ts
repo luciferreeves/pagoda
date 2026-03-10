@@ -33,3 +33,34 @@ export interface PaginatedResponse<T> {
   per_page: number;
   total_pages: number;
 }
+
+export interface AuditLogEntry {
+  system_ref: string;
+  actor: string;
+  action: string;
+  target_type: string;
+  target_ref: string;
+  summary: string;
+  created_at: string;
+}
+
+export interface AuditLogDetail extends AuditLogEntry {
+  details: string;
+}
+
+export const AUDIT_ACTION_LABELS: Record<string, string> = {
+  "user.ban": "Ban User",
+  "user.unban": "Unban User",
+  "user.disable": "Disable User",
+  "user.enable": "Enable User",
+  "user.role_change": "Role Change",
+  "user.edit": "Edit User",
+  "user.warn": "Warn User",
+  "user.unwarn": "Deactivate Warning",
+  "ticket.update": "Update Ticket",
+};
+
+export const AUDIT_TARGET_LABELS: Record<string, string> = {
+  user: "User",
+  ticket: "Ticket",
+};
