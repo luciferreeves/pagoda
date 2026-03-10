@@ -1,4 +1,4 @@
-import { createSignal, onMount, onCleanup, Show, For } from "solid-js";
+import { createSignal, onMount, Show, For } from "solid-js";
 import { useParams, A } from "@solidjs/router";
 import { api, uploadFile } from "../../api";
 import { auth } from "../../store/auth";
@@ -7,6 +7,8 @@ import type { AdminUser } from "../../types/admin";
 import { formatDate } from "../../utils/format";
 import { statusBadge } from "../../utils/status";
 import { extractError } from "../../utils/api";
+import { useClickOutside } from "../../utils/clickOutside";
+import { formatBirthday, birthdayToMonthDay } from "../../utils/birthday";
 import Modal from "../../components/Modal";
 import Editor from "../../components/Editor";
 import StaffGuard from "../../components/StaffGuard";
@@ -322,13 +324,7 @@ export default function CouncilUser() {
       return roles;
     };
 
-    onMount(() => {
-      function handleClickOutside(e: MouseEvent) {
-        if (roleRef && !roleRef.contains(e.target as Node)) setRoleOpen(false);
-      }
-      document.addEventListener("mousedown", handleClickOutside);
-      onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
-    });
+    useClickOutside(() => roleRef, setRoleOpen);
 
     function pickRole(role: string) {
       setEditing((prev: Record<string, string>) => ({ ...prev, role }));
@@ -454,7 +450,7 @@ export default function CouncilUser() {
                       <div class="council-detail-row">
                         <span class="council-detail-label">Birthday</span>
                         <span class="council-detail-value">
-                          <span>{target().birthday ? (() => { const raw = target().birthday!; const parts = raw.includes("T") ? raw.split("T")[0].split("-") : raw.split("-"); const month = parseInt(parts.length === 3 ? parts[1] : parts[0]) - 1; const day = parseInt(parts.length === 3 ? parts[2] : parts[1]); const months = ["January","February","March","April","May","June","July","August","September","October","November","December"]; return `${months[month]} ${day}`; })() : "—"}</span>
+                          <span>{formatBirthday(target().birthday)}</span>
                           <Show when={isAdmin()}>
                             <button type="button" class="council-detail-edit-trigger" onClick={() => setEditingBirthday(true)}>Edit</button>
                           </Show>
@@ -465,7 +461,7 @@ export default function CouncilUser() {
                         <span class="council-detail-label">Birthday</span>
                         <span class="council-detail-editable">
                           <MonthDayPicker
-                            value={(() => { const raw = target().birthday; if (!raw) return ""; const parts = raw.includes("T") ? raw.split("T")[0].split("-") : raw.split("-"); return parts.length === 3 ? `${parts[1]}-${parts[2]}` : raw; })()}
+                            value={birthdayToMonthDay(target().birthday)}
                             onChange={setBirthdayValue}
                           />
                           <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => { saveField("birthday", birthdayValue()); setEditingBirthday(false); }}>Save</button>

@@ -1,6 +1,8 @@
-import { createSignal } from "solid-js";
+import { createSignal, Show } from "solid-js";
 import { A, useNavigate } from "@solidjs/router";
 import { auth } from "../store/auth";
+
+const EMAIL_NOT_VERIFIED = "Your email address has not been verified. Please check your inbox.";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -27,7 +29,14 @@ export default function Login() {
   return (
     <section>
       <h2 class="page-title">Log In</h2>
-      {error() && <div class="form-error">{error()}</div>}
+      <Show when={error()}>
+        <div class="form-error">
+          {error()}
+          <Show when={error() === EMAIL_NOT_VERIFIED}>
+            {" "}<A href="/account/reactivate">Resend verification email</A>
+          </Show>
+        </div>
+      </Show>
       <form class="auth-form" onSubmit={handleSubmit}>
         <label class="form-field">
           <span>Username</span>

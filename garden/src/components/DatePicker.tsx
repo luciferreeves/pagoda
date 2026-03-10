@@ -1,4 +1,5 @@
-import { createSignal, onMount, onCleanup, Show, For } from "solid-js";
+import { createSignal, Show, For } from "solid-js";
+import { useClickOutside } from "../utils/clickOutside";
 
 interface DatePickerProps {
   value: string;
@@ -49,15 +50,7 @@ export default function DatePicker(props: DatePickerProps) {
     setOpen(!open());
   }
 
-  onMount(() => {
-    function handleClickOutside(e: MouseEvent) {
-      if (open() && containerRef && !containerRef.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
-  });
+  useClickOutside(() => containerRef, setOpen);
 
   function prevMonth() {
     if (viewMonth() === 0) {

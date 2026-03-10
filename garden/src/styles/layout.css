@@ -493,7 +493,11 @@ a:hover {
   padding: 8px 10px;
   font-size: 12px;
   margin-bottom: 10px;
-  max-width: 360px;
+}
+
+.form-error a {
+  color: var(--color-error);
+  text-decoration: underline;
 }
 
 .form-success {
@@ -503,7 +507,6 @@ a:hover {
   padding: 8px 10px;
   font-size: 12px;
   margin-bottom: 10px;
-  max-width: 360px;
 }
 
 .form-footer {

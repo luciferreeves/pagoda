@@ -1,9 +1,10 @@
-import { createSignal, onMount, onCleanup, Show, For } from "solid-js";
+import { createSignal, onMount, Show, For } from "solid-js";
 import { useNavigate, useSearchParams } from "@solidjs/router";
 import { council } from "../../store/council";
 import type { AuditLogEntry } from "../../types/admin";
 import { AUDIT_ACTION_LABELS, AUDIT_TARGET_LABELS } from "../../types/admin";
 import { formatDateTime } from "../../utils/format";
+import { useClickOutside } from "../../utils/clickOutside";
 import Pagination from "../../components/Pagination";
 import StaffGuard from "../../components/StaffGuard";
 
@@ -17,15 +18,12 @@ export default function CouncilAuditLog() {
   let actionRef: HTMLDivElement | undefined;
   let targetRef: HTMLDivElement | undefined;
 
+  useClickOutside(() => actionRef, setActionOpen);
+  useClickOutside(() => targetRef, setTargetOpen);
+
   onMount(() => {
     const p = parseInt(searchParams.page as string) || council.auditPage();
     council.loadAuditLogs(p);
-    function handleClickOutside(e: MouseEvent) {
-      if (actionRef && !actionRef.contains(e.target as Node)) setActionOpen(false);
-      if (targetRef && !targetRef.contains(e.target as Node)) setTargetOpen(false);
-    }
-    document.addEventListener("mousedown", handleClickOutside);
-    onCleanup(() => document.removeEventListener("mousedown", handleClickOutside));
   });
 
   function pickAction(value: string) {
