@@ -56,5 +56,4 @@ else
   echo "[entrypoint] SEED not set, skipping seed"
 fi
 
-echo "[entrypoint] Waiting on server process..."
 wait $SHRINE_PID
