@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"image"
+	_ "image/jpeg"
 	"image/png"
 	"shrine/repositories"
 	"shrine/utils/logger"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/chromedp/chromedp"
 	"golang.org/x/image/draw"
+	_ "golang.org/x/image/webp"
 )
 
 const (
