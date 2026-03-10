@@ -14,7 +14,10 @@ exec_sql_file() {
   if [ "$DB_DRIVER" = "sqlite" ]; then
     sqlite3 "$DSN" < "$1"
   elif [ "$DB_DRIVER" = "libsql" ]; then
+    local BATCH_SIZE=10
     local STMTS=""
+    local COUNT=0
+    local BATCH_NUM=0
     while IFS= read -r line; do
       line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
       [ -z "$line" ] && continue
@@ -23,12 +26,43 @@ exec_sql_file() {
       local ESCAPED
       ESCAPED=$(printf '%s' "$line" | sed 's/\\/\\\\/g; s/"/\\"/g')
       STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"${ESCAPED}\"}},"
+      COUNT=$((COUNT + 1))
+      if [ "$COUNT" -ge "$BATCH_SIZE" ]; then
+        BATCH_NUM=$((BATCH_NUM + 1))
+        STMTS="${STMTS%,}"
+        echo "  Sending batch $BATCH_NUM ($BATCH_SIZE statements)..."
+        RESULT=$(curl -s -w "\n%{http_code}" "${TURSO_URL}/v2/pipeline" \
+          -H "Authorization: Bearer ${TURSO_TOKEN}" \
+          -H "Content-Type: application/json" \
+          -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}")
+        HTTP_CODE=$(echo "$RESULT" | tail -1)
+        if [ "$HTTP_CODE" != "200" ]; then
+          echo "  Turso batch $BATCH_NUM failed with HTTP $HTTP_CODE"
+          echo "$RESULT" | sed '$d' | head -5
+          exit 1
+        fi
+        echo "  Batch $BATCH_NUM OK"
+        STMTS=""
+        COUNT=0
+      fi
     done < "$1"
-    STMTS="${STMTS%,}"
-    curl -sf "${TURSO_URL}/v2/pipeline" \
-      -H "Authorization: Bearer ${TURSO_TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}" > /dev/null
+    if [ "$COUNT" -gt 0 ]; then
+      BATCH_NUM=$((BATCH_NUM + 1))
+      STMTS="${STMTS%,}"
+      echo "  Sending final batch $BATCH_NUM ($COUNT statements)..."
+      RESULT=$(curl -s -w "\n%{http_code}" "${TURSO_URL}/v2/pipeline" \
+        -H "Authorization: Bearer ${TURSO_TOKEN}" \
+        -H "Content-Type: application/json" \
+        -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}")
+      HTTP_CODE=$(echo "$RESULT" | tail -1)
+      if [ "$HTTP_CODE" != "200" ]; then
+        echo "  Turso final batch failed with HTTP $HTTP_CODE"
+        echo "$RESULT" | sed '$d' | head -5
+        exit 1
+      fi
+      echo "  Batch $BATCH_NUM OK"
+    fi
+    echo "  All $BATCH_NUM batches sent successfully"
   fi
 }
 
