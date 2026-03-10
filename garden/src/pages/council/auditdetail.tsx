@@ -4,6 +4,8 @@ import { api } from "../../api";
 import { auth } from "../../store/auth";
 import type { AuditLogDetail } from "../../types/admin";
 import { AUDIT_ACTION_LABELS } from "../../types/admin";
+import { ROLE_LABELS } from "../../types/roles";
+import { formatDateTimeFull } from "../../utils/format";
 import StaffGuard from "../../components/StaffGuard";
 
 interface FieldChange {
@@ -27,11 +29,6 @@ export default function CouncilAuditDetail() {
       setError("Audit log not found.");
     }
   });
-
-  function formatDate(date: string) {
-    const d = new Date(date);
-    return d.toLocaleDateString() + " " + d.toLocaleTimeString();
-  }
 
   function actionLabel(action: string) {
     return AUDIT_ACTION_LABELS[action] || action;
@@ -96,7 +93,7 @@ export default function CouncilAuditDetail() {
         <Show when={data.disabled_until}>
           <div class="council-detail-row">
             <span class="council-detail-label">Until</span>
-            <span class="council-detail-value">{formatDate(data.disabled_until!)}</span>
+            <span class="council-detail-value">{formatDateTimeFull(data.disabled_until!)}</span>
           </div>
         </Show>
         <div class="council-detail-row">
@@ -113,13 +110,13 @@ export default function CouncilAuditDetail() {
         <div class="council-detail-row">
           <span class="council-detail-label">Old Role</span>
           <span class="council-detail-value">
-            <span class={`council-role council-role-${data.old_role}`}>{data.old_role}</span>
+            <span class={`council-role council-role-${data.old_role}`}>{ROLE_LABELS[data.old_role] || data.old_role}</span>
           </span>
         </div>
         <div class="council-detail-row">
           <span class="council-detail-label">New Role</span>
           <span class="council-detail-value">
-            <span class={`council-role council-role-${data.new_role}`}>{data.new_role}</span>
+            <span class={`council-role council-role-${data.new_role}`}>{ROLE_LABELS[data.new_role] || data.new_role}</span>
           </span>
         </div>
       </div>
@@ -216,7 +213,7 @@ export default function CouncilAuditDetail() {
                   </div>
                   <div class="council-detail-row">
                     <span class="council-detail-label">Date</span>
-                    <span class="council-detail-value">{formatDate(e().created_at)}</span>
+                    <span class="council-detail-value">{formatDateTimeFull(e().created_at)}</span>
                   </div>
                   <div class="council-detail-row">
                     <span class="council-detail-label">Action</span>

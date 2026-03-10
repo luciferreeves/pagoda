@@ -3,6 +3,8 @@ import { useNavigate, useSearchParams } from "@solidjs/router";
 import { council } from "../../store/council";
 import type { AuditLogEntry } from "../../types/admin";
 import { AUDIT_ACTION_LABELS, AUDIT_TARGET_LABELS } from "../../types/admin";
+import { formatDateTime } from "../../utils/format";
+import Pagination from "../../components/Pagination";
 import StaffGuard from "../../components/StaffGuard";
 
 export default function CouncilAuditLog() {
@@ -56,11 +58,6 @@ export default function CouncilAuditLog() {
   function goToPage(p: number) {
     setSearchParams({ page: String(p) });
     council.loadAuditLogs(p);
-  }
-
-  function formatDate(date: string) {
-    const d = new Date(date);
-    return d.toLocaleDateString() + " " + d.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
   }
 
   function actionLabel(action: string) {
@@ -129,7 +126,7 @@ export default function CouncilAuditLog() {
             <For each={council.auditLogs()}>
               {(entry: AuditLogEntry) => (
                 <div class="council-grid-row" onClick={() => navigate(`/council/auditlog/${entry.system_ref}`)}>
-                  <span class="council-audit-date">{formatDate(entry.created_at)}</span>
+                  <span class="council-audit-date">{formatDateTime(entry.created_at)}</span>
                   <span class="council-audit-action">{actionLabel(entry.action)}</span>
                   <span>{entry.actor}</span>
                   <span class="council-audit-target">
@@ -144,29 +141,7 @@ export default function CouncilAuditLog() {
         </Show>
       </div>
 
-      <Show when={council.auditTotalPages() > 1}>
-        <div class="council-pagination">
-          <button
-            type="button"
-            class="council-page-btn"
-            disabled={council.auditPage() <= 1}
-            onClick={() => goToPage(council.auditPage() - 1)}
-          >
-            Prev
-          </button>
-          <span class="council-page-info">
-            Page {council.auditPage()} of {council.auditTotalPages()} ({council.auditTotal()} entries)
-          </span>
-          <button
-            type="button"
-            class="council-page-btn"
-            disabled={council.auditPage() >= council.auditTotalPages()}
-            onClick={() => goToPage(council.auditPage() + 1)}
-          >
-            Next
-          </button>
-        </div>
-      </Show>
+      <Pagination page={council.auditPage()} totalPages={council.auditTotalPages()} total={council.auditTotal()} label="entries" onPage={goToPage} />
     </section>
     </StaffGuard>
   );

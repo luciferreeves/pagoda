@@ -3,6 +3,9 @@ import { useNavigate, useSearchParams } from "@solidjs/router";
 import { council } from "../../store/council";
 import { ROLE_LABELS } from "../../types/roles";
 import type { AdminUser } from "../../types/admin";
+import { formatDate } from "../../utils/format";
+import { statusBadge } from "../../utils/status";
+import Pagination from "../../components/Pagination";
 import StaffGuard from "../../components/StaffGuard";
 
 export default function CouncilUsers() {
@@ -25,17 +28,6 @@ export default function CouncilUsers() {
   function goToPage(p: number) {
     setSearchParams({ page: String(p) });
     council.loadUsers(p, council.search());
-  }
-
-  function statusBadge(user: AdminUser) {
-    if (user.account_banned) return "banned";
-    if (user.account_disabled) return "disabled";
-    if (!user.email_verified) return "unverified";
-    return "active";
-  }
-
-  function formatDate(date: string) {
-    return new Date(date).toLocaleDateString();
   }
 
   function sortIndicator(field: string) {
@@ -99,27 +91,7 @@ export default function CouncilUsers() {
         </Show>
       </div>
 
-      <Show when={council.totalPages() > 1}>
-        <div class="council-pagination">
-          <button
-            class="council-page-btn"
-            disabled={council.page() <= 1}
-            onClick={() => goToPage(council.page() - 1)}
-          >
-            Prev
-          </button>
-          <span class="council-page-info">
-            Page {council.page()} of {council.totalPages()} ({council.total()} users)
-          </span>
-          <button
-            class="council-page-btn"
-            disabled={council.page() >= council.totalPages()}
-            onClick={() => goToPage(council.page() + 1)}
-          >
-            Next
-          </button>
-        </div>
-      </Show>
+      <Pagination page={council.page()} totalPages={council.totalPages()} total={council.total()} label="users" onPage={goToPage} />
     </section>
     </StaffGuard>
   );

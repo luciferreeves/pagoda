@@ -4,6 +4,9 @@ import { api, uploadFile } from "../../api";
 import { auth } from "../../store/auth";
 import { UserRole, ROLE_LABELS } from "../../types/roles";
 import type { AdminUser } from "../../types/admin";
+import { formatDate } from "../../utils/format";
+import { statusBadge } from "../../utils/status";
+import { extractError } from "../../utils/api";
 import Modal from "../../components/Modal";
 import Editor from "../../components/Editor";
 import StaffGuard from "../../components/StaffGuard";
@@ -72,20 +75,6 @@ export default function CouncilUser() {
     return me?.role === UserRole.Owner || me?.role === UserRole.Admin;
   }
 
-  function statusBadge() {
-    const target = user();
-    if (!target) return "";
-    if (target.account_banned) return "banned";
-    if (target.account_disabled) return "disabled";
-    if (!target.email_verified) return "unverified";
-    return "active";
-  }
-
-  function formatDate(date: string | null) {
-    if (!date) return "\u2014";
-    return new Date(date).toLocaleDateString();
-  }
-
   function startEdit(field: string, value: string) {
     setEditing((prev: Record<string, string>) => ({ ...prev, [field]: value }));
   }
@@ -113,7 +102,7 @@ export default function CouncilUser() {
       setUser(response.data);
       cancelEdit(field);
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setActionError(extractError(response.data));
     }
   }
 
@@ -131,7 +120,7 @@ export default function CouncilUser() {
     if (response.ok) {
       setUser(response.data);
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setActionError(extractError(response.data));
     }
   }
 
@@ -150,7 +139,7 @@ export default function CouncilUser() {
       setUser(response.data);
       cancelEdit("role");
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setActionError(extractError(response.data));
     }
   }
 
@@ -178,7 +167,7 @@ export default function CouncilUser() {
       setWarnTitle("");
       setWarnBody("");
     } else {
-      setModalError((response.data as unknown as { error: string }).error);
+      setModalError(extractError(response.data));
     }
   }
 
@@ -204,7 +193,7 @@ export default function CouncilUser() {
       setDisableReason("");
       setDisableUntil("");
     } else {
-      setModalError((response.data as unknown as { error: string }).error);
+      setModalError(extractError(response.data));
     }
   }
 
@@ -226,7 +215,7 @@ export default function CouncilUser() {
       setModal(null);
       setBanReason("");
     } else {
-      setModalError((response.data as unknown as { error: string }).error);
+      setModalError(extractError(response.data));
     }
   }
 
@@ -243,7 +232,7 @@ export default function CouncilUser() {
     if (response.ok) {
       setUser(response.data);
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setActionError(extractError(response.data));
     }
   }
 
@@ -260,7 +249,7 @@ export default function CouncilUser() {
     if (response.ok) {
       setUser(response.data);
     } else {
-      setActionError((response.data as unknown as { error: string }).error);
+      setActionError(extractError(response.data));
     }
   }
 
@@ -288,7 +277,7 @@ export default function CouncilUser() {
       setModal(null);
       setJadeAmount("");
     } else {
-      setModalError((response.data as unknown as { error: string }).error);
+      setModalError(extractError(response.data));
     }
   }
 
@@ -530,7 +519,7 @@ export default function CouncilUser() {
                                 const result = await uploadFile<{ url: string }>("/council/upload", file, auth.token()!);
                                 setUploadingImage(false);
                                 if (!result.ok) {
-                                  setActionError((result.data as unknown as { error: string }).error);
+                                  setActionError(extractError(result.data));
                                   return;
                                 }
                                 html += `<img src="${result.data.url}" alt="" class="signature-image" />`;
@@ -618,7 +607,7 @@ export default function CouncilUser() {
                   <div class="council-detail-card">
                     <img src={target().avatar_url} alt="" class="council-detail-card-avatar" />
                     <span class="council-detail-card-username">@{target().username}</span>
-                    <span class={`council-status council-status-${statusBadge()}`}>{statusBadge()}</span>
+                    <span class={`council-status council-status-${statusBadge(target())}`}>{statusBadge(target())}</span>
                     <span class={`council-role council-role-${target().role}`}>{ROLE_LABELS[target().role] || target().role}</span>
                   </div>
                 </div>

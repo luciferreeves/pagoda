@@ -2,6 +2,8 @@ import { createSignal, onMount, Show, For } from "solid-js";
 import { useSearchParams } from "@solidjs/router";
 import { api } from "../../api";
 import { auth } from "../../store/auth";
+import { formatDate } from "../../utils/format";
+import Pagination from "../../components/Pagination";
 import StaffGuard from "../../components/StaffGuard";
 import Modal from "../../components/Modal";
 
@@ -60,10 +62,6 @@ export default function BannedIPs() {
     loadBans(p);
   });
 
-  function formatDate(date: string) {
-    return new Date(date).toLocaleDateString();
-  }
-
   return (
     <StaffGuard>
       <section>
@@ -98,13 +96,7 @@ export default function BannedIPs() {
           </Show>
         </div>
 
-        <Show when={totalPages() > 1}>
-          <div class="council-pagination">
-            <button class="council-page-btn" disabled={page() <= 1} onClick={() => loadBans(page() - 1)}>Prev</button>
-            <span class="council-page-info">Page {page()} of {totalPages()} ({total()} bans)</span>
-            <button class="council-page-btn" disabled={page() >= totalPages()} onClick={() => loadBans(page() + 1)}>Next</button>
-          </div>
-        </Show>
+        <Pagination page={page()} totalPages={totalPages()} total={total()} label="bans" onPage={loadBans} />
         <Show when={confirmBan()}>
           {(ban: () => IPBan) => (
             <Modal title="Lift IP Ban" onClose={() => setConfirmBan(null)}>
