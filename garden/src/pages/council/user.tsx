@@ -87,11 +87,11 @@ export default function CouncilUser() {
   }
 
   function startEdit(field: string, value: string) {
-    setEditing((prev) => ({ ...prev, [field]: value }));
+    setEditing((prev: Record<string, string>) => ({ ...prev, [field]: value }));
   }
 
   function cancelEdit(field: string) {
-    setEditing((prev) => {
+    setEditing((prev: Record<string, string>) => {
       const next = { ...prev };
       delete next[field];
       return next;
@@ -312,7 +312,7 @@ export default function CouncilUser() {
               type="text"
               class="council-detail-edit-input"
               value={editing()[props.field]}
-              onInput={(e) => setEditing((prev) => ({ ...prev, [props.field]: e.currentTarget.value }))}
+              onInput={(e) => setEditing((prev: Record<string, string>) => ({ ...prev, [props.field]: e.currentTarget.value }))}
               onKeyDown={(e) => { if (e.key === "Enter") saveEdit(props.field); if (e.key === "Escape") cancelEdit(props.field); }}
             />
             <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveEdit(props.field)}>Save</button>
@@ -350,10 +350,10 @@ export default function CouncilUser() {
               aria-label="Change role"
               title="Change role"
               value={editing()["role"]}
-              onChange={(e) => setEditing((prev) => ({ ...prev, role: e.currentTarget.value }))}
+              onChange={(e) => setEditing((prev: Record<string, string>) => ({ ...prev, role: e.currentTarget.value }))}
             >
               <For each={availableRoles()}>
-                {(role) => <option value={role}>{role}</option>}
+                {(role: UserRole) => <option value={role}>{role}</option>}
               </For>
             </select>
             <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveRole(editing()["role"])}>Save</button>
@@ -374,7 +374,7 @@ export default function CouncilUser() {
       </Show>
 
       <Show when={user()}>
-        {(target) => (
+        {(target: () => AdminUser) => (
           <>
             <Show when={actionError()}>
               <div class="form-error">{actionError()}</div>
@@ -432,7 +432,7 @@ export default function CouncilUser() {
                             type="text"
                             class="council-detail-edit-input"
                             value={editing()["website"]}
-                            onInput={(event) => setEditing((prev) => ({ ...prev, website: event.currentTarget.value }))}
+                            onInput={(event) => setEditing((prev: Record<string, string>) => ({ ...prev, website: event.currentTarget.value }))}
                             onKeyDown={(e) => { if (e.key === "Enter") saveEdit("website"); if (e.key === "Escape") cancelEdit("website"); }}
                           />
                           <button type="button" class="council-detail-edit-btn council-action-save" onClick={() => saveEdit("website")}>Save</button>

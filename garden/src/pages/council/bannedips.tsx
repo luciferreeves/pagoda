@@ -77,7 +77,7 @@ export default function BannedIPs() {
               <div class="council-grid-empty">No banned IPs.</div>
             }>
               <For each={bans()}>
-                {(ban) => (
+                {(ban: IPBan) => (
                   <div class="council-grid-row">
                     <span class="council-ip">{ban.IP}</span>
                     <span>{ban.Reason}</span>
@@ -100,7 +100,7 @@ export default function BannedIPs() {
           </div>
         </Show>
         <Show when={confirmBan()}>
-          {(ban) => (
+          {(ban: () => IPBan) => (
             <Modal title="Lift IP Ban" onClose={() => setConfirmBan(null)}>
               <p style={{ "font-size": "12px", margin: "0 0 12px" }}>Lift ban on <strong>{ban().IP}</strong>?</p>
               <div class="modal-actions">

@@ -66,7 +66,7 @@ export default function CouncilUsers() {
             <div class="council-grid-empty">No users found.</div>
           }>
             <For each={council.users()}>
-              {(user) => (
+              {(user: AdminUser) => (
                 <div class="council-grid-row" onClick={() => navigate(`/council/users/${user.username}`)}>
                   <span class="council-user-cell">
                     <img src={user.avatar_url} alt="" class="council-avatar" />

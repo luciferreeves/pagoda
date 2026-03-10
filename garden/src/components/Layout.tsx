@@ -6,6 +6,8 @@ import NavSection from "./NavSection";
 import { auth } from "../store/auth";
 import { stats } from "../store/stats";
 import { UserRole } from "../types/roles";
+import type { CitizenSummary } from "../types/stats";
+
 
 interface LayoutProps {
   children: JSX.Element;
@@ -147,7 +149,7 @@ export default function Layout(props: LayoutProps) {
                 <li class="placeholder">Be the first to join!</li>
               }>
                 <For each={stats.data()?.newest_citizens}>
-                  {(citizen) => (
+                  {(citizen: CitizenSummary) => (
                     <li class="citizen-item">
                       <A href={`/p/${citizen.username}`}>
                         <img src={citizen.avatar_url} alt="" class="citizen-avatar" />
@@ -165,7 +167,7 @@ export default function Layout(props: LayoutProps) {
                 <li class="placeholder">No one online.</li>
               }>
                 <For each={stats.data()?.online_citizens}>
-                  {(citizen) => (
+                  {(citizen: CitizenSummary) => (
                     <li class="citizen-item">
                       <A href={`/p/${citizen.username}`}>
                         <img src={citizen.avatar_url} alt="" class="citizen-avatar" />

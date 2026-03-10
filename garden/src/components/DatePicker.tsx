@@ -121,17 +121,17 @@ export default function DatePicker(props: DatePickerProps) {
           </div>
           <div class="datepicker-weekdays">
             <For each={WEEKDAYS}>
-              {(day) => <span class="datepicker-weekday">{day}</span>}
+              {(day: string) => <span class="datepicker-weekday">{day}</span>}
             </For>
           </div>
           <div class="datepicker-grid">
             <For each={calendarDays()}>
-              {(day) => (
+              {(day: number | null) => (
                 <Show when={day !== null} fallback={<span class="datepicker-blank" />}>
                   <button
                     type="button"
                     class="datepicker-day"
-                    classList={{ "datepicker-day-selected": isSelected(day!) }}
+                    classList={{ "datepicker-day-selected": isSelected(day!) ?? undefined }}
                     onClick={() => selectDay(day!)}
                   >
                     {day}

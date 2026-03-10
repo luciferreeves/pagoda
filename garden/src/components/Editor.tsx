@@ -613,7 +613,7 @@ export default function Editor(props: EditorProps) {
       <Show when={attachments().length > 0 || pendingUploads().length > 0}>
         <div class="editor-attachments">
           <For each={attachments()}>
-            {(attachment) => (
+            {(attachment: AttachmentResult) => (
               <div class="editor-attachment" title={attachment.file_name}>
                 <Show when={attachment.category === "image"} fallback={
                   <Show when={attachment.category === "video"} fallback={
@@ -637,7 +637,7 @@ export default function Editor(props: EditorProps) {
             )}
           </For>
           <For each={pendingUploads()}>
-            {(pending) => (
+            {(pending: PendingUpload) => (
               <div class="editor-attachment editor-attachment-uploading" title={pending.name}>
                 <Show when={pending.type.startsWith("image/") && pending.preview} fallback={
                   <Show when={pending.type.startsWith("video/") && pending.preview} fallback={
