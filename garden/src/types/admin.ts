@@ -58,9 +58,12 @@ export const AUDIT_ACTION_LABELS: Record<string, string> = {
   "user.warn": "Warn User",
   "user.unwarn": "Deactivate Warning",
   "ticket.update": "Update Ticket",
+  "district.review": "Review Site",
+  "district.edit": "Edit Site",
 };
 
 export const AUDIT_TARGET_LABELS: Record<string, string> = {
   user: "User",
   ticket: "Ticket",
+  site: "Site",
 };

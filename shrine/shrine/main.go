@@ -6,6 +6,7 @@ import (
 	"os/signal"
 	"shrine/config"
 	"shrine/database"
+	"shrine/jobs"
 	"shrine/middleware"
 	"shrine/router"
 	"shrine/utils/logger"
@@ -43,10 +44,12 @@ func main() {
 		}
 	}()
 
+	jobs.Start()
 	logger.Successf("Main", "Server started on %s:%d", config.Server.Host, config.Server.Port)
 
 	<-quit
 	logger.Infof("Main", "Shutting down gracefully...")
+	jobs.Stop()
 
 	if err := app.Shutdown(); err != nil {
 		logger.Errorf("Main", "Error during server shutdown: %v", err)

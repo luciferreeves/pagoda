@@ -39,4 +39,10 @@ func init() {
 	urls.Path(enums.DELETE, "/bannedips/:id", auth.RequireAdmin(controllers.DeleteIPBanController), "bannedipdelete")
 
 	urls.Path(enums.POST, "/upload", auth.RequireAdmin(controllers.UploadImageController), "upload")
+
+	urls.Path(enums.GET, "/districts/requests", auth.RequireStaff(controllers.ListSiteRequestsController), "districtreqs")
+	urls.Path(enums.POST, "/districts/sites/:ref/review", auth.RequireStaff(controllers.ReviewSiteController), "districtreview")
+	urls.Path(enums.GET, "/districts/sites", auth.RequireStaff(controllers.ListAdminSitesController), "districtsites")
+	urls.Path(enums.PATCH, "/districts/sites/:ref", auth.RequireStaff(controllers.EditSiteController), "districtedit")
+	urls.Path(enums.GET, "/districts/pending", auth.RequireStaff(controllers.CountPendingSitesController), "districtpending")
 }

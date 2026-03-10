@@ -1,0 +1,416 @@
+.district-intro {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  margin-bottom: 16px;
+}
+
+.district-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.district-card {
+  display: flex;
+  align-items: center;
+  border: 1px solid;
+  padding: 14px 16px;
+  text-decoration: none;
+  color: var(--color-text);
+  transition: filter 0.15s;
+}
+
+.district-card:hover {
+  filter: brightness(1.15);
+}
+
+.district-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.district-card-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.district-card-desc {
+  font-size: 12px;
+  margin: 2px 0 4px;
+}
+
+.district-card-count {
+  font-size: 11px;
+  opacity: 0.7;
+}
+
+.district-card-icon {
+  flex-shrink: 0;
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.district-card-icon img {
+  width: 100px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.icon-outlined {
+  filter:
+    drop-shadow(1px 0 0 rgba(255, 255, 255, 0.4))
+    drop-shadow(-1px 0 0 rgba(255, 255, 255, 0.4))
+    drop-shadow(0 1px 0 rgba(255, 255, 255, 0.4))
+    drop-shadow(0 -1px 0 rgba(255, 255, 255, 0.4));
+}
+
+.district-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.district-header-info {
+  flex: 1;
+}
+
+.district-back {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  text-decoration: none;
+}
+
+.district-back:hover {
+  color: var(--color-text);
+}
+
+.district-description {
+  font-size: 13px;
+  color: var(--color-text-muted);
+}
+
+.district-header-icon {
+  flex-shrink: 0;
+  width: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.district-header-icon img {
+  width: 125px;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.35)) drop-shadow(0 0 1px rgba(255, 255, 255, 0.5));
+}
+
+.district-filters {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  align-items: stretch;
+}
+
+.district-filters input {
+  flex: 1;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 6px 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+}
+
+.district-filters input:focus {
+  border-color: var(--color-purple);
+}
+
+.district-filters .form-button {
+  padding: 0 12px;
+}
+
+.site-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.site-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text);
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+
+.site-card:hover {
+  border-color: var(--color-purple);
+}
+
+.site-card-thumbnail {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: var(--color-bg);
+}
+
+.site-card-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.site-card-placeholder {
+  width: 100%;
+  height: 100%;
+  background: var(--color-panel-header);
+}
+
+.site-card-info {
+  padding: 8px 10px;
+}
+
+.site-card-title {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-card-url {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin: 2px 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.site-card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.site-tag {
+  font-size: 10px;
+  background: var(--color-panel-header);
+  border: 1px solid var(--color-border);
+  padding: 1px 6px;
+  color: var(--color-text-muted);
+}
+
+.site-tag.removable {
+  cursor: pointer;
+}
+
+.site-tag.removable:hover {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.site-card-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: var(--color-text-muted);
+  margin-top: 6px;
+}
+
+.submit-site-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 600px;
+}
+
+.submit-site-form textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 6px 8px;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--color-text);
+  outline: none;
+  resize: vertical;
+}
+
+.submit-site-form textarea:focus {
+  border-color: var(--color-purple);
+}
+
+.submit-site-form .form-button {
+  align-self: flex-start;
+}
+
+.district-select-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+.district-select-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border: 2px solid;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text);
+  text-align: left;
+  transition: filter 0.15s;
+}
+
+.district-select-option:hover {
+  filter: brightness(1.15);
+}
+
+.district-select-icon {
+  width: 44px;
+  height: auto;
+  image-rendering: pixelated;
+}
+
+.tag-input-row {
+  display: flex;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.tag-input-row input {
+  flex: 1;
+}
+
+.tag-input-row .form-button {
+  padding: 6px 12px;
+}
+
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 6px;
+}
+
+.council-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.council-tab {
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 8px 16px;
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.council-tab:hover {
+  color: var(--color-text);
+}
+
+.council-tab.active {
+  color: var(--color-red);
+  border-bottom-color: var(--color-red);
+}
+
+.district-req-grid .council-grid-header,
+.district-req-grid .council-grid-row {
+  grid-template-columns: 3fr 2fr 2fr 1.5fr 2fr;
+}
+
+.district-site-grid .council-grid-header,
+.district-site-grid .council-grid-row {
+  grid-template-columns: 3fr 2fr 3fr 1.5fr;
+}
+
+.council-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.action-btn {
+  background: var(--color-panel-header);
+  border: 1px solid var(--color-border);
+  padding: 2px 8px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.action-btn:hover {
+  background: var(--color-bg);
+}
+
+.action-btn.approve {
+  border-color: var(--color-green);
+  color: var(--color-green);
+}
+
+.action-btn.deny {
+  border-color: var(--color-red);
+  color: var(--color-red);
+}
+
+.action-btn.hold {
+  border-color: var(--color-yellow);
+  color: var(--color-yellow);
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending { color: var(--color-yellow); }
+.status-approved { color: var(--color-green); }
+.status-denied { color: var(--color-red); }
+.status-hold { color: var(--color-cyan); }
+
+.modal-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.form-button.secondary {
+  background: var(--color-panel-header);
+}
+
+.form-button.secondary:hover {
+  background: var(--color-border);
+}
+
+.loading-text,
+.empty-text {
+  font-size: 13px;
+  color: var(--color-text-muted);
+  padding: 16px 0;
+}

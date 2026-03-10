@@ -14,5 +14,9 @@ export const routes: RouteDefinition[] = [
   { path: "/council/bannedips", component: lazy(() => import("./pages/council/bannedips")) },
   { path: "/council/auditlog", component: lazy(() => import("./pages/council/auditlog")) },
   { path: "/council/auditlog/:ref", component: lazy(() => import("./pages/council/auditdetail")) },
+  { path: "/council/districts", component: lazy(() => import("./pages/council/districts")) },
+  { path: "/districts", component: lazy(() => import("./pages/districts/index")) },
+  { path: "/districts/submit", component: lazy(() => import("./pages/districts/submit")) },
+  { path: "/districts/:slug", component: lazy(() => import("./pages/districts/district")) },
   { path: "**", component: lazy(() => import("./errors/404")) },
 ];
