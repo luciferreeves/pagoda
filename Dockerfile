@@ -17,8 +17,11 @@ FROM debian:bookworm-slim
 WORKDIR /shrine
 
 RUN apt-get update && \
-    apt-get install -y ca-certificates tzdata curl sqlite3 apache2-utils && \
+    apt-get install -y ca-certificates tzdata curl sqlite3 apache2-utils \
+    chromium && \
     rm -rf /var/lib/apt/lists/*
+
+ENV CHROME_PATH=/usr/bin/chromium
 
 COPY --from=builder /shrine/bin/shrine .
 COPY --from=builder /shrine/templates ./templates
