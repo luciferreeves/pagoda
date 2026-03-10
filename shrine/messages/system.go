@@ -10,4 +10,5 @@ const (
 	CannotActionSelf        = "You cannot %s yourself."
 	CannotActionOwner       = "You cannot %s the owner."
 	OnlyOwnerCanActionAdmin = "Only the owner can %s an administrator."
+	FailedLibSQLConnection  = "Failed to open libsql connection: %v."
 )

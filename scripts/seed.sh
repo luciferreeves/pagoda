@@ -1,16 +1,56 @@
 #!/bin/bash
 set -euo pipefail
 
-DB_PATH="shrine/pagoda.db"
 SEED_DIR="seed"
+DB_DRIVER="${DB_DRIVER:-sqlite}"
+DSN="${DSN:-shrine/pagoda.db}"
 
-if [ ! -f "$DB_PATH" ]; then
-  echo "Database not found at $DB_PATH"
+if [ "$DB_DRIVER" = "libsql" ]; then
+  TURSO_URL=$(echo "$DSN" | sed 's|^libsql://|https://|; s|?.*||')
+  TURSO_TOKEN=$(echo "$DSN" | sed -n 's/.*authToken=\(.*\)/\1/p')
+fi
+
+exec_sql_file() {
+  if [ "$DB_DRIVER" = "sqlite" ]; then
+    sqlite3 "$DSN" < "$1"
+  elif [ "$DB_DRIVER" = "libsql" ]; then
+    local STMTS=""
+    while IFS= read -r line; do
+      line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
+      [ -z "$line" ] && continue
+      [ "$line" = "BEGIN TRANSACTION;" ] && continue
+      [ "$line" = "COMMIT;" ] && continue
+      local ESCAPED
+      ESCAPED=$(printf '%s' "$line" | sed 's/\\/\\\\/g; s/"/\\"/g')
+      STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"${ESCAPED}\"}},"
+    done < "$1"
+    STMTS="${STMTS%,}"
+    curl -sf "${TURSO_URL}/v2/pipeline" \
+      -H "Authorization: Bearer ${TURSO_TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}" > /dev/null
+  fi
+}
+
+query_sql() {
+  if [ "$DB_DRIVER" = "sqlite" ]; then
+    sqlite3 "$DSN" "$1"
+  elif [ "$DB_DRIVER" = "libsql" ]; then
+    curl -sf "${TURSO_URL}/v2/pipeline" \
+      -H "Authorization: Bearer ${TURSO_TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d "{\"requests\":[{\"type\":\"execute\",\"stmt\":{\"sql\":\"$1\"}},{\"type\":\"close\"}]}" \
+      | sed -n 's/.*"value":"\([^"]*\)".*/\1/p' | head -1
+  fi
+}
+
+if [ "$DB_DRIVER" = "sqlite" ] && [ ! -f "$DSN" ]; then
+  echo "Database not found at $DSN"
   exit 1
 fi
 
-EXISTING=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM users;")
-if [ "$EXISTING" -gt 0 ]; then
+EXISTING=$(query_sql "SELECT COUNT(*) FROM users;")
+if [ -n "$EXISTING" ] && [ "$EXISTING" -gt 0 ] 2>/dev/null; then
   echo "Database already has $EXISTING users, skipping seed"
   exit 0
 fi
@@ -273,8 +313,8 @@ done
 
 echo "COMMIT;" >> "$SQL_FILE"
 
-echo "Inserting into database..."
-sqlite3 "$DB_PATH" < "$SQL_FILE"
+echo "Inserting into database ($DB_DRIVER)..."
+exec_sql_file "$SQL_FILE"
 
-TOTAL=$(sqlite3 "$DB_PATH" "SELECT COUNT(*) FROM users;")
+TOTAL=$(query_sql "SELECT COUNT(*) FROM users;")
 echo "Done. Total users: $TOTAL (admins: $ADMIN_COUNT, mods: $MOD_COUNT, banned: $BANNED_COUNT, disabled: $DISABLED_COUNT, unverified: $UNVERIFIED_COUNT)"

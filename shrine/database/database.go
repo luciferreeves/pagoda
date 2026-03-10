@@ -3,9 +3,13 @@ package database
 import (
 	"shrine/config"
 	"shrine/enums"
+	"shrine/messages"
 	"shrine/utils/logger"
 	"time"
 
+	"database/sql"
+
+	_ "github.com/tursodatabase/libsql-client-go/libsql"
 	"gorm.io/driver/postgres"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
@@ -28,6 +32,12 @@ func init() {
 		dialector = sqlite.Open(config.Database.DSN)
 	case enums.Postgres:
 		dialector = postgres.Open(config.Database.DSN)
+	case enums.LibSQL:
+		db, err := sql.Open("libsql", config.Database.DSN)
+		if err != nil {
+			logger.Fatalf("Database", messages.FailedLibSQLConnection, err)
+		}
+		dialector = sqlite.Dialector{Conn: db}
 	default:
 		logger.Fatalf("Database", "Invalid database driver: %s", config.Database.Driver)
 	}
