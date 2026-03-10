@@ -24,7 +24,7 @@ func verifyConfig() error {
 
 func verifyDatabaseDriver(driver enums.DatabaseDriver) bool {
 	switch driver {
-	case enums.SQLite, enums.Postgres, enums.LibSQL:
+	case enums.SQLite, enums.Postgres:
 		return true
 	default:
 		return false

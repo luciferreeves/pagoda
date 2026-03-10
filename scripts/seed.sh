@@ -2,86 +2,15 @@
 set -euo pipefail
 
 SEED_DIR="seed"
-DB_DRIVER="${DB_DRIVER:-sqlite}"
-DSN="${DSN:-shrine/pagoda.db}"
-
-if [ "$DB_DRIVER" = "libsql" ]; then
-  TURSO_URL=$(echo "$DSN" | sed 's|^libsql://|https://|; s|?.*||')
-  TURSO_TOKEN=$(echo "$DSN" | sed -n 's/.*authToken=\(.*\)/\1/p')
-fi
+DSN="${DSN:-pagoda.db}"
 
 exec_sql_file() {
-  if [ "$DB_DRIVER" = "sqlite" ]; then
-    sqlite3 "$DSN" < "$1"
-  elif [ "$DB_DRIVER" = "libsql" ]; then
-    local BATCH_SIZE=10
-    local STMTS=""
-    local COUNT=0
-    local BATCH_NUM=0
-    while IFS= read -r line; do
-      line=$(echo "$line" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')
-      [ -z "$line" ] && continue
-      [ "$line" = "BEGIN TRANSACTION;" ] && continue
-      [ "$line" = "COMMIT;" ] && continue
-      local ESCAPED
-      ESCAPED=$(printf '%s' "$line" | sed 's/\\/\\\\/g; s/"/\\"/g')
-      STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"${ESCAPED}\"}},"
-      COUNT=$((COUNT + 1))
-      if [ "$COUNT" -ge "$BATCH_SIZE" ]; then
-        BATCH_NUM=$((BATCH_NUM + 1))
-        STMTS="${STMTS%,}"
-        echo "  Sending batch $BATCH_NUM ($BATCH_SIZE statements)..."
-        RESULT=$(curl -s -w "\n%{http_code}" "${TURSO_URL}/v2/pipeline" \
-          -H "Authorization: Bearer ${TURSO_TOKEN}" \
-          -H "Content-Type: application/json" \
-          -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}")
-        HTTP_CODE=$(echo "$RESULT" | tail -1)
-        if [ "$HTTP_CODE" != "200" ]; then
-          echo "  Turso batch $BATCH_NUM failed with HTTP $HTTP_CODE"
-          echo "$RESULT" | sed '$d' | head -5
-          exit 1
-        fi
-        echo "  Batch $BATCH_NUM OK"
-        STMTS=""
-        COUNT=0
-      fi
-    done < "$1"
-    if [ "$COUNT" -gt 0 ]; then
-      BATCH_NUM=$((BATCH_NUM + 1))
-      STMTS="${STMTS%,}"
-      echo "  Sending final batch $BATCH_NUM ($COUNT statements)..."
-      RESULT=$(curl -s -w "\n%{http_code}" "${TURSO_URL}/v2/pipeline" \
-        -H "Authorization: Bearer ${TURSO_TOKEN}" \
-        -H "Content-Type: application/json" \
-        -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}")
-      HTTP_CODE=$(echo "$RESULT" | tail -1)
-      if [ "$HTTP_CODE" != "200" ]; then
-        echo "  Turso final batch failed with HTTP $HTTP_CODE"
-        echo "$RESULT" | sed '$d' | head -5
-        exit 1
-      fi
-      echo "  Batch $BATCH_NUM OK"
-    fi
-    echo "  All $BATCH_NUM batches sent successfully"
-  fi
+  sqlite3 "$DSN" < "$1"
 }
 
 query_sql() {
-  if [ "$DB_DRIVER" = "sqlite" ]; then
-    sqlite3 "$DSN" "$1"
-  elif [ "$DB_DRIVER" = "libsql" ]; then
-    curl -sf "${TURSO_URL}/v2/pipeline" \
-      -H "Authorization: Bearer ${TURSO_TOKEN}" \
-      -H "Content-Type: application/json" \
-      -d "{\"requests\":[{\"type\":\"execute\",\"stmt\":{\"sql\":\"$1\"}},{\"type\":\"close\"}]}" \
-      | sed -n 's/.*"value":"\([^"]*\)".*/\1/p' | head -1
-  fi
+  sqlite3 "$DSN" "$1"
 }
-
-if [ "$DB_DRIVER" = "sqlite" ] && [ ! -f "$DSN" ]; then
-  echo "Database not found at $DSN"
-  exit 1
-fi
 
 EXISTING=$(query_sql "SELECT COUNT(*) FROM users;")
 if [ -n "$EXISTING" ] && [ "$EXISTING" -gt 0 ] 2>/dev/null; then
@@ -226,19 +155,8 @@ echo "BEGIN TRANSACTION;" > "$SQL_FILE"
 OWNER_BIO_ESC=$(escape_sql "$OWNER_BIO")
 OWNER_SIG_ESC=$(escape_sql "$OWNER_SIG")
 
-cat >> "$SQL_FILE" << OWNERSQL
-INSERT OR IGNORE INTO users (
-  username, email, password_hash, display_name, role, email_verified,
-  jade, honor, pronouns, location, bio, signature, birthday, last_seen_at,
-  ip, created_at, updated_at
-) VALUES (
-  'master', 'master@pagoda.local', '${HASH}', 'Master', 'owner', 1,
-  1000, 500, 'sol/solis', 'The Cloud',
-  '${OWNER_BIO_ESC}', '${OWNER_SIG_ESC}',
-  '1904-03-15T00:00:00Z', '${OWNER_SEEN}',
-  '127.0.0.1', '${OWNER_DATE}', '${OWNER_DATE}'
-);
-OWNERSQL
+printf "INSERT OR IGNORE INTO users (username, email, password_hash, display_name, role, email_verified, jade, honor, pronouns, location, bio, signature, birthday, last_seen_at, ip, created_at, updated_at) VALUES ('master', 'master@pagoda.local', '%s', 'Master', 'owner', 1, 1000, 500, 'sol/solis', 'The Cloud', '%s', '%s', '1904-03-15T00:00:00Z', '%s', '127.0.0.1', '%s', '%s');\n" \
+  "$HASH" "$OWNER_BIO_ESC" "$OWNER_SIG_ESC" "$OWNER_SEEN" "$OWNER_DATE" "$OWNER_DATE" >> "$SQL_FILE"
 
 echo "Generating $CITIZEN_COUNT citizens..."
 
@@ -347,7 +265,7 @@ done
 
 echo "COMMIT;" >> "$SQL_FILE"
 
-echo "Inserting into database ($DB_DRIVER)..."
+echo "Inserting into database..."
 exec_sql_file "$SQL_FILE"
 
 TOTAL=$(query_sql "SELECT COUNT(*) FROM users;")
