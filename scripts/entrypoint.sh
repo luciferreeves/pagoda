@@ -9,25 +9,34 @@ if [ "$SEED" = "true" ]; then
   elif [ "$DB_DRIVER" = "libsql" ]; then
     TURSO_URL=$(echo "$DSN" | sed 's|^libsql://|https://|; s|?.*||')
     TURSO_TOKEN=$(echo "$DSN" | sed -n 's/.*authToken=\(.*\)/\1/p')
+    INDEXES=$(curl -s "${TURSO_URL}/v2/pipeline" \
+      -H "Authorization: Bearer ${TURSO_TOKEN}" \
+      -H "Content-Type: application/json" \
+      -d '{"requests":[{"type":"execute","stmt":{"sql":"SELECT name FROM sqlite_master WHERE type='\''index'\'' AND name NOT LIKE '\''sqlite_%'\''"}},{"type":"close"}]}' \
+      | grep -o '"type":"text","value":"[^"]*"' | sed 's/.*"value":"//;s/"//')
     TABLES=$(curl -s "${TURSO_URL}/v2/pipeline" \
       -H "Authorization: Bearer ${TURSO_TOKEN}" \
       -H "Content-Type: application/json" \
       -d '{"requests":[{"type":"execute","stmt":{"sql":"SELECT name FROM sqlite_master WHERE type='\''table'\'' AND name NOT LIKE '\''sqlite_%'\'' AND name NOT LIKE '\''_litestream%'\''"}},{"type":"close"}]}' \
       | grep -o '"type":"text","value":"[^"]*"' | sed 's/.*"value":"//;s/"//')
-    if [ -n "$TABLES" ]; then
-      STMTS=""
-      for TABLE in $TABLES; do
-        echo "[entrypoint] Dropping table: $TABLE"
-        STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"DROP TABLE IF EXISTS ${TABLE}\"}},"
-      done
+    STMTS=""
+    for INDEX in $INDEXES; do
+      echo "[entrypoint] Dropping index: $INDEX"
+      STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"DROP INDEX IF EXISTS ${INDEX}\"}},"
+    done
+    for TABLE in $TABLES; do
+      echo "[entrypoint] Dropping table: $TABLE"
+      STMTS="${STMTS}{\"type\":\"execute\",\"stmt\":{\"sql\":\"DROP TABLE IF EXISTS ${TABLE}\"}},"
+    done
+    if [ -n "$STMTS" ]; then
       STMTS="${STMTS%,}"
       curl -s "${TURSO_URL}/v2/pipeline" \
         -H "Authorization: Bearer ${TURSO_TOKEN}" \
         -H "Content-Type: application/json" \
         -d "{\"requests\":[${STMTS},{\"type\":\"close\"}]}" > /dev/null
-      echo "[entrypoint] All tables dropped"
+      echo "[entrypoint] All indexes and tables dropped"
     else
-      echo "[entrypoint] No tables to drop"
+      echo "[entrypoint] Nothing to drop"
     fi
   fi
 fi
