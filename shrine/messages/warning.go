@@ -8,6 +8,7 @@ const (
 	WarningMessageRequired = "Warning message is required."
 	WarningNotFound        = "Warning not found."
 	WarningAlreadyInactive = "Warning is already inactive."
-	FailedCreateWarning    = "Failed to create warning."
+	FailedCreateWarning         = "Failed to create warning."
+	FailedCreateWarningDetailed = "Failed to create warning for %s: %v."
 	FailedDeactivateWarn   = "Failed to deactivate warning."
 )

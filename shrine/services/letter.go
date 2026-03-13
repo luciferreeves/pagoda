@@ -75,6 +75,9 @@ func CreateLetter(userID uint, request letter.CreateRequest) (*common.MessageRes
 		if recipient.ID == userID {
 			continue
 		}
+		if recipient.LetterPrivacy == enums.LetterPrivacyFriends {
+			return nil, fail(enums.BadRequest, fmt.Sprintf(messages.RecipientNotAcceptingLetters, username))
+		}
 		recipientIDs = append(recipientIDs, recipient.ID)
 	}
 

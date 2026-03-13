@@ -5,7 +5,8 @@ import type { Stats } from "../types/stats";
 const [data, setData] = createSignal<Stats | null>(null);
 
 async function load() {
-  const response = await api<Stats>("/stats/");
+  const token = localStorage.getItem("token");
+  const response = await api<Stats>("/stats/", { token });
   if (response.ok) {
     setData(response.data);
   }

@@ -45,6 +45,7 @@ type User struct {
 	DisabledBy      *uint      `gorm:"index"`
 	DisabledUntil   *time.Time
 	WarningCount    uint       `gorm:"not null;default:0"`
+	LetterPrivacy   enums.LetterPrivacy `gorm:"size:20;not null;default:public"`
 	LastSeenAt      *time.Time
 	IP              string     `gorm:"size:45"`
 }
@@ -194,20 +195,27 @@ func (self *User) BeforeCreate(tx *gorm.DB) error {
 }
 
 func (self *User) BeforeUpdate(tx *gorm.DB) error {
-	if !validators.IsValidEmail(self.Email) {
-		return errors.New(messages.InvalidEmail)
+	if self.Email == "" && self.DisplayName == "" {
+		return nil
 	}
 
-	if len(strings.TrimSpace(self.DisplayName)) < 1 || len(strings.TrimSpace(self.DisplayName)) > 50 {
-		return errors.New(messages.InvalidDisplayName)
+	if self.Email != "" {
+		if !validators.IsValidEmail(self.Email) {
+			return errors.New(messages.InvalidEmail)
+		}
+		self.Email = strings.ToLower(strings.TrimSpace(self.Email))
+	}
+
+	if self.DisplayName != "" {
+		if len(strings.TrimSpace(self.DisplayName)) < 1 || len(strings.TrimSpace(self.DisplayName)) > 50 {
+			return errors.New(messages.InvalidDisplayName)
+		}
+		self.DisplayName = strings.TrimSpace(self.DisplayName)
 	}
 
 	if self.Jade > validators.MaxJade {
 		return errors.New(messages.JadeExceedsMax)
 	}
-
-	self.Email = strings.ToLower(strings.TrimSpace(self.Email))
-	self.DisplayName = strings.TrimSpace(self.DisplayName)
 
 	return nil
 }

@@ -83,7 +83,7 @@ export default function Layout(props: LayoutProps) {
                 {((user) => (
                   <>
                     <li><A href={`/p/${user.username}`}>My Domain</A></li>
-                    <li><A href="/letters">Letters</A></li>
+                    <li><A href="/letters">Letters<Show when={(stats.data()?.unread_letters ?? 0) > 0}> ({stats.data()!.unread_letters})</Show></A></li>
                     <li><A href="/account">Account</A></li>
                     <li><A href="/account/settings">Settings</A></li>
                     <li><button type="button" class="sidebar-logout" onClick={() => auth.logout()}>Log Out</button></li>
@@ -122,7 +122,7 @@ export default function Layout(props: LayoutProps) {
                   <li><A href="/council/bannedips">Banned IPs</A></li>
                 </Show>
                 <li><A href="/council/bazaar">Bazaar</A></li>
-                <li><A href="/council/districts">Districts</A></li>
+                <li><A href="/council/districts">Districts<Show when={(stats.data()?.pending_districts ?? 0) > 0}> ({stats.data()!.pending_districts})</Show></A></li>
                 <li><A href="/council/forums">Forums</A></li>
                 <li><A href="/council/reports">Reports</A></li>
                 <li><A href="/council/users">Users</A></li>

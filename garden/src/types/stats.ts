@@ -7,6 +7,8 @@ export interface CitizenSummary {
 export interface Stats {
   citizens: number;
   online: number;
+  unread_letters: number;
+  pending_districts: number;
   newest_citizens: CitizenSummary[];
   online_citizens: CitizenSummary[];
 }

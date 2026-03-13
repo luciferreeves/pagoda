@@ -18,5 +18,7 @@ export const routes: RouteDefinition[] = [
   { path: "/districts", component: lazy(() => import("./pages/districts/index")) },
   { path: "/districts/submit", component: lazy(() => import("./pages/districts/submit")) },
   { path: "/districts/:slug", component: lazy(() => import("./pages/districts/district")) },
+  { path: "/letters", component: lazy(() => import("./pages/letters/index")) },
+  { path: "/letters/:ref", component: lazy(() => import("./pages/letters/detail")) },
   { path: "**", component: lazy(() => import("./errors/404")) },
 ];

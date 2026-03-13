@@ -1,0 +1,362 @@
+.letters-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.letters-header .page-title {
+  margin: 0;
+}
+
+.letters-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.letters-empty {
+  text-align: center;
+  color: var(--color-text-muted);
+  font-style: italic;
+  padding: 40px 8px;
+}
+
+.letter-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  text-decoration: none;
+  color: var(--color-text);
+  transition: background 0.15s;
+}
+
+.letter-item:hover {
+  background: var(--color-overlay-light);
+}
+
+.letter-unread {
+  background: var(--color-overlay-lighter);
+}
+
+.letter-avatars {
+  display: flex;
+  flex-shrink: 0;
+}
+
+.letter-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--color-panel);
+  object-fit: cover;
+}
+
+.letter-avatar:not(:first-child) {
+  margin-left: -10px;
+}
+
+.letter-avatar-more {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-panel-header);
+  border: 2px solid var(--color-panel);
+  margin-left: -10px;
+  font-size: 11px;
+  color: var(--color-text-muted);
+}
+
+.letter-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.letter-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.letter-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.letter-system-badge {
+  display: inline-block;
+  background: var(--color-purple);
+  color: var(--color-white);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 1px 5px;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.letter-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.letter-preview {
+  font-size: 12px;
+  color: var(--color-text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-top: 2px;
+}
+
+.letter-unread-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-pink);
+  flex-shrink: 0;
+}
+
+.letter-detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.letter-back {
+  background: none;
+  border: none;
+  color: var(--color-link);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 0;
+}
+
+.letter-back:hover {
+  color: var(--color-link-hover);
+}
+
+.letter-detail-title {
+  flex: 1;
+  font-size: 18px;
+  margin: 0;
+  color: var(--color-text-bright);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.letter-detail-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.letter-participants {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 8px 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.letter-participant {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.letter-participant-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.letter-messages {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 16px;
+}
+
+.letter-message {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.letter-message-own {
+  background: var(--color-overlay-lighter);
+}
+
+.letter-message-deleted {
+  opacity: 0.5;
+}
+
+.letter-message-sender {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+.letter-message-avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.letter-message-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-bright);
+}
+
+.letter-message-time {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  margin-left: auto;
+}
+
+.letter-message-body {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.letter-message-body p {
+  margin: 0 0 4px;
+}
+
+.letter-message-deleted-text {
+  font-style: italic;
+  color: var(--color-text-muted);
+}
+
+.letter-message-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.letter-msg-action {
+  background: none;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 11px;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 0;
+}
+
+.letter-msg-action:hover {
+  color: var(--color-text);
+}
+
+.letter-msg-action-delete:hover {
+  color: var(--color-red);
+}
+
+.letter-message-edit {
+  margin-top: 6px;
+}
+
+.letter-message-edit textarea {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 6px 8px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.letter-message-edit textarea:focus {
+  border-color: var(--color-purple);
+}
+
+.letter-message-edit-actions {
+  display: flex;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.letter-attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+}
+
+.letter-attachment {
+  text-decoration: none;
+}
+
+.letter-attachment-image {
+  max-width: 200px;
+  max-height: 150px;
+  border: 1px solid var(--color-border);
+  object-fit: cover;
+}
+
+.letter-attachment-file {
+  display: inline-block;
+  padding: 4px 8px;
+  background: var(--color-panel-header);
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+  color: var(--color-link);
+}
+
+.letter-attachment-file:hover {
+  color: var(--color-link-hover);
+}
+
+.letter-reply {
+  border-top: 1px solid var(--color-border);
+  padding-top: 12px;
+}
+
+.letter-reply textarea {
+  width: 100%;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-body);
+  font-size: 13px;
+  padding: 8px;
+  resize: vertical;
+  outline: none;
+  box-sizing: border-box;
+  margin-bottom: 8px;
+}
+
+.letter-reply textarea:focus {
+  border-color: var(--color-purple);
+}
+
+.letter-reply .form-button {
+  margin-top: 0;
+}

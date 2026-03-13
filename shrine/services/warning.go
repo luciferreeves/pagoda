@@ -10,6 +10,7 @@ import (
 	"shrine/types/hypertext"
 	"shrine/types/warning"
 	"shrine/utils/auth"
+	"shrine/utils/logger"
 	"shrine/utils/meta"
 	"shrine/utils/sanitize"
 	"strings"
@@ -32,6 +33,7 @@ func WarnUser(admin *models.User, target *models.User, request warning.WarnReque
 
 	record, err := repositories.CreateWarning(admin.ID, target.ID, title, sanitizedMessage)
 	if err != nil {
+		logger.Errorf("Warnings", messages.FailedCreateWarningDetailed, target.Username, err)
 		return nil, fail(enums.Internal, messages.FailedCreateWarning)
 	}
 

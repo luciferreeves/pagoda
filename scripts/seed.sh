@@ -138,8 +138,8 @@ ONE_MONTH_AGO=$(date -v-1m +%s 2>/dev/null || date -d "1 month ago" +%s)
 ONE_MONTH_AHEAD=$(date -v+1m +%s 2>/dev/null || date -d "1 month" +%s)
 FOUR_MONTHS_AGO=$(date -v-4m +%s 2>/dev/null || date -d "4 months ago" +%s)
 
-OWNER_DATE=$(date -r $FOUR_MONTHS_AGO +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -d "@$FOUR_MONTHS_AGO" +"%Y-%m-%dT%H:%M:%SZ")
-OWNER_SEEN=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+OWNER_DATE=$(date -r $FOUR_MONTHS_AGO +"%Y-%m-%d %H:%M:%S+00:00" 2>/dev/null || date -d "@$FOUR_MONTHS_AGO" +"%Y-%m-%d %H:%M:%S+00:00")
+OWNER_SEEN=$(date -u +"%Y-%m-%d %H:%M:%S+00:00")
 OWNER_BIO='<p class="editor-paragraph"><i><em class="editor-italic" style="white-space: pre-wrap;">A really awesome cool slick ninja dinosaur thingy</em></i></p>'
 OWNER_SIG='<p class="editor-paragraph"><span style="white-space: pre-wrap;">Love and Ciao</span></p>'
 
@@ -155,7 +155,7 @@ echo "BEGIN TRANSACTION;" > "$SQL_FILE"
 OWNER_BIO_ESC=$(escape_sql "$OWNER_BIO")
 OWNER_SIG_ESC=$(escape_sql "$OWNER_SIG")
 
-printf "INSERT OR IGNORE INTO users (username, email, password_hash, display_name, role, email_verified, jade, honor, pronouns, location, bio, signature, birthday, last_seen_at, ip, created_at, updated_at) VALUES ('master', 'master@pagoda.local', '%s', 'Master', 'owner', 1, 1000, 500, 'sol/solis', 'The Cloud', '%s', '%s', '1904-03-15T00:00:00Z', '%s', '127.0.0.1', '%s', '%s');\n" \
+printf "INSERT OR IGNORE INTO users (username, email, password_hash, display_name, role, email_verified, jade, honor, pronouns, location, bio, signature, birthday, last_seen_at, ip, created_at, updated_at) VALUES ('master', 'master@pagoda.local', '%s', 'Master', 'owner', 1, 1000, 500, 'sol/solis', 'The Cloud', '%s', '%s', '1904-03-15 00:00:00+00:00', '%s', '127.0.0.1', '%s', '%s');\n" \
   "$HASH" "$OWNER_BIO_ESC" "$OWNER_SIG_ESC" "$OWNER_SEEN" "$OWNER_DATE" "$OWNER_DATE" >> "$SQL_FILE"
 
 echo "Generating $CITIZEN_COUNT citizens..."
@@ -187,16 +187,16 @@ for ((i=0; i<CITIZEN_COUNT; i++)); do
   LOC=${LOCATIONS[$(( RANDOM % ${#LOCATIONS[@]} ))]}
 
   JOIN_EPOCH=$(random_date_between $THREE_MONTHS_AGO $NOW_EPOCH)
-  JOIN_DATE=$(date -r $JOIN_EPOCH +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -d "@$JOIN_EPOCH" +"%Y-%m-%dT%H:%M:%SZ")
+  JOIN_DATE=$(date -r $JOIN_EPOCH +"%Y-%m-%d %H:%M:%S+00:00" 2>/dev/null || date -d "@$JOIN_EPOCH" +"%Y-%m-%d %H:%M:%S+00:00")
 
-  SEEN_OFFSET=$(( RANDOM % (7 * 24 * 3600) ))
+  SEEN_OFFSET=$(( RANDOM % (90 * 24 * 3600) ))
   SEEN_EPOCH=$(( NOW_EPOCH - SEEN_OFFSET ))
-  LAST_SEEN=$(date -r $SEEN_EPOCH +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -d "@$SEEN_EPOCH" +"%Y-%m-%dT%H:%M:%SZ")
+  LAST_SEEN=$(date -r $SEEN_EPOCH +"%Y-%m-%d %H:%M:%S+00:00" 2>/dev/null || date -d "@$SEEN_EPOCH" +"%Y-%m-%d %H:%M:%S+00:00")
 
   BDAY_EPOCH=$(random_date_between $ONE_MONTH_AGO $ONE_MONTH_AHEAD)
   BDAY_MONTH=$(date -r $BDAY_EPOCH +"%m" 2>/dev/null || date -d "@$BDAY_EPOCH" +"%m")
   BDAY_DAY=$(date -r $BDAY_EPOCH +"%d" 2>/dev/null || date -d "@$BDAY_EPOCH" +"%d")
-  BIRTHDAY="1904-${BDAY_MONTH}-${BDAY_DAY}T00:00:00Z"
+  BIRTHDAY="1904-${BDAY_MONTH}-${BDAY_DAY} 00:00:00+00:00"
 
   JADE=$(( RANDOM % 500 ))
   HONOR=$(( RANDOM % 200 ))

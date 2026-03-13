@@ -41,8 +41,10 @@ type AdminUserResponse struct {
 }
 
 type StatsResponse struct {
-	Citizens       int64                    `json:"citizens"`
-	Online         int64                    `json:"online"`
-	NewestCitizens []CitizenSummaryResponse `json:"newest_citizens"`
-	OnlineCitizens []CitizenSummaryResponse `json:"online_citizens"`
+	Citizens         int64                    `json:"citizens"`
+	Online           int64                    `json:"online"`
+	UnreadLetters    int64                    `json:"unread_letters"`
+	PendingDistricts int64                    `json:"pending_districts"`
+	NewestCitizens   []CitizenSummaryResponse `json:"newest_citizens"`
+	OnlineCitizens   []CitizenSummaryResponse `json:"online_citizens"`
 }

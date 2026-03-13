@@ -49,13 +49,13 @@ func UpdateLastSeen(user *models.User) {
 
 func CountCitizens() int64 {
 	var count int64
-	database.DB.Model(&models.User{}).Where("email_verified = ?", true).Count(&count)
+	database.DB.Model(&models.User{}).Where("email_verified = ? AND account_banned = ? AND account_disabled = ?", true, false, false).Count(&count)
 	return count
 }
 
 func CountOnline() int64 {
 	var count int64
-	database.DB.Model(&models.User{}).Where("last_seen_at > ?", time.Now().Add(-5*time.Minute)).Count(&count)
+	database.DB.Model(&models.User{}).Where("last_seen_at > ? AND account_banned = ? AND account_disabled = ?", time.Now().Add(-5*time.Minute), false, false).Count(&count)
 	return count
 }
 

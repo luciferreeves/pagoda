@@ -118,6 +118,17 @@ func GetLetterMessages(letterID uint, p meta.Pagination) ([]models.LetterMessage
 	return messages, total
 }
 
+func CountUnreadLetters(userID uint) int64 {
+	var count int64
+	database.DB.Model(&models.LetterParticipant{}).
+		Joins("JOIN letters ON letters.id = letter_participants.letter_id").
+		Joins("JOIN letter_messages ON letter_messages.letter_id = letters.id AND letter_messages.deleted_at IS NULL").
+		Where("letter_participants.user_id = ? AND (letter_participants.last_read_at IS NULL OR letter_messages.created_at > letter_participants.last_read_at)", userID).
+		Distinct("letter_participants.letter_id").
+		Count(&count)
+	return count
+}
+
 func ListLettersForUser(userID uint, p meta.Pagination) ([]models.Letter, int64) {
 	var letters []models.Letter
 	var total int64
