@@ -2,7 +2,7 @@
 set -euo pipefail
 
 SEED_DIR="seed"
-DSN="${DSN:-pagoda.db}"
+DSN="${1:-${DSN:-pagoda.db}}"
 
 exec_sql_file() {
   sqlite3 "$DSN" < "$1"
